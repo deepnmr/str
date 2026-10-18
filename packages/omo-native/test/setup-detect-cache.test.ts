@@ -85,7 +85,9 @@ function runLauncher(fixture: Fixture, args: string[], tty = false) {
   // A developer machine exports the agent directory for its own install; an inherited OMO_* value
   // would outrank the fixture's SENPI_* override and answer with real machine state.
   // launcher.test.ts defends the same way.
-  const inherited: NodeJS.ProcessEnv = { ...process.env, CAPTURE_FILE: fixture.captureFile }
+  // STR_NO_DEFAULTS keeps a real opencodex on this machine from seeding the fixture's agent dir;
+  // str-defaults.test.ts owns that behaviour.
+  const inherited: NodeJS.ProcessEnv = { ...process.env, CAPTURE_FILE: fixture.captureFile, STR_NO_DEFAULTS: "1" }
   delete inherited.STR_CODING_AGENT_DIR
   delete inherited.OMO_CODING_AGENT_DIR
   delete inherited.PI_CODING_AGENT_DIR

@@ -15,6 +15,7 @@ import { migrateLegacyBunGlobalManifest } from "./legacy-bun-global-migration.js
 import { adoptLegacyFlatState, canonicalAgentDir } from "./agent-dir.js"
 import { BRAND_NAME, COMMAND, ENV_PREFIX, HOME_DIRNAME, PACKAGE_NAME, REPOSITORY_URL } from "./brand.js"
 import { pinStrHome } from "./str-home.js"
+import { seedStrAgentDir } from "./str-defaults.js"
 import { nearestNodeBin, packageManifest, packageRoot, readJson, releaseBanner, releaseChannel, resolveSenpi, updateTarget } from "./package-paths.js"
 import { runSelfUpdate } from "./self-update.js"
 import { isSelfUpdate } from "./update-args.js"
@@ -145,8 +146,20 @@ function preparedSenpi() {
   return senpi
 }
 
+// A session launch connects opencodex by default and hides the Dori skill rezong replaces; setup,
+// doctor and the other in-process commands never write these defaults. Never blocks a launch.
+function applyStrDefaults() {
+  if (process.env.STR_NO_DEFAULTS) return
+  try {
+    seedStrAgentDir({ agentDir: canonicalAgentDir() })
+  } catch (error) {
+    if (process.env.OMO_DEBUG) console.error(`${COMMAND}: could not apply defaults: ${error.message}`)
+  }
+}
+
 async function spawnSenpi(args, withExtension) {
   const senpi = preparedSenpi()
+  if (withExtension) applyStrDefaults()
   const finalArgs = withExtension
     ? ["--extension", join(packageRoot, "plugin"), ...args]
     : args

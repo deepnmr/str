@@ -4,7 +4,8 @@
   "type": "module",
   "description": "str - the standalone str command with the OMO extension built in: bun add -g @deepnmr/str",
   "bin": {
-    "str": "bin/str.js"
+    "str": "bin/str.js",
+    "rezong": "bin/rezong.js"
   },
   "files": [
     "bin",

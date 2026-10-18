@@ -34,8 +34,8 @@ describe("omo-ai published package shape", () => {
     })
 
     describe("#when the bin map is audited", () => {
-      test("#then it exposes exactly the str command pointing at bin/str.js", () => {
-        expect(manifest.bin).toEqual({ str: "bin/str.js" })
+      test("#then it exposes exactly the str and rezong commands", () => {
+        expect(manifest.bin).toEqual({ str: "bin/str.js", rezong: "bin/rezong.js" })
       })
     })
 
