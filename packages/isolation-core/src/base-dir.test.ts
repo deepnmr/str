@@ -23,6 +23,16 @@ test("chooses the home directory on the same device", async () => {
     baseDir: join(home, ".omo/wt", segment), crossDevice: false,
   })
 })
+test("places the home base under OMO_HOME_DIR when set", async () => {
+  const brand = resolve("/omo-brand/.str")
+  const selection = await chooseBaseDir(repo, home, id, sameDevice, { OMO_HOME_DIR: brand })
+  expect(selection).toEqual({ baseDir: join(brand, "wt", segment), crossDevice: false })
+})
+test("keeps the ~/.omo base when OMO_HOME_DIR is unset or blank", async () => {
+  const expected = { baseDir: join(home, ".omo/wt", segment), crossDevice: false }
+  expect(await chooseBaseDir(repo, home, id, sameDevice, {})).toEqual(expected)
+  expect(await chooseBaseDir(repo, home, id, sameDevice, { OMO_HOME_DIR: "  " })).toEqual(expected)
+})
 test("chooses the mount root on a different writable device", async () => {
   const io: BaseDirIO = {
     stat: async (path) => ({ dev: onVolume(path) ? 2 : 1 }),

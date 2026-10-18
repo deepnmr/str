@@ -33,11 +33,13 @@ export async function chooseBaseDir(
   homeDir: string,
   id = "",
   io: BaseDirIO = filesystem,
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<BaseDirSelection> {
   const segment = `t${createHash("sha1").update(repoRoot + id).digest("hex").slice(0, 10)}`
-  const homeBase = join(homeDir, ".omo", "wt", segment)
+  const brandHome = env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(homeDir, ".omo")
+  const homeBase = join(brandHome, "wt", segment)
   const repoDevice = (await io.stat(repoRoot)).dev
-  let homeParent = join(homeDir, ".omo")
+  let homeParent = brandHome
   let homeDevice: number
   for (;;) {
     try {
