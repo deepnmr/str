@@ -56,7 +56,7 @@ describe("OmO Native telemetry notice", () => {
 
       // then
       expect(notifications).toEqual([
-        "OmO Native sends anonymous usage telemetry (no prompts, no paths). Docs: https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/reference/senpi-telemetry.md - opt out: DO_NOT_TRACK=1",
+        "str Native sends anonymous usage telemetry (no prompts, no paths). Docs: https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/reference/senpi-telemetry.md - opt out: DO_NOT_TRACK=1",
       ])
     })
   })

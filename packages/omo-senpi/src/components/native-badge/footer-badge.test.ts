@@ -38,7 +38,7 @@ describe("createNativeBadgeStatus", () => {
     test("#when the session publishes #then the badge text is set under a leading status key", () => {
       const { calls, ctx } = uiSpy()
       createNativeBadgeStatus(NATIVE_BADGE_TEXT).publish(ctx)
-      expect(calls).toEqual([{ key: NATIVE_BADGE_STATUS_KEY, text: "(😺 OmO Native by Q Kim)" }])
+      expect(calls).toEqual([{ key: NATIVE_BADGE_STATUS_KEY, text: "(str Native)" }])
     })
 
     test("#when publish runs repeatedly #then the badge is written once per call without duplication", () => {
@@ -71,13 +71,13 @@ describe("createNativeBadgeStatus", () => {
 describe("resolveNativeBadgeText", () => {
   test("#given an omob runtime whose package.json carries the dev build stamp #then the badge shows the coffee cup", () => {
     const dir = runtimePackageDir({ version: "0.0.0-omob.412e7fd.abcdc6d", omoBuild: { command: "omob", omo: {}, engine: {} } })
-    expect(resolveNativeBadgeText({ OMO_PACKAGE_DIR: dir })).toBe("(☕ OmO Native by Q Kim)")
-    expect(NATIVE_BADGE_DEV_BUILD_TEXT).toBe("(☕ OmO Native by Q Kim)")
+    expect(resolveNativeBadgeText({ OMO_PACKAGE_DIR: dir })).toBe("(str Native dev)")
+    expect(NATIVE_BADGE_DEV_BUILD_TEXT).toBe("(str Native dev)")
   })
 
   test("#given a release runtime package.json without a build stamp #then the badge shows the cat", () => {
     const dir = runtimePackageDir({ version: "5.0.0-beta.88" })
-    expect(resolveNativeBadgeText({ OMO_PACKAGE_DIR: dir })).toBe("(😺 OmO Native by Q Kim)")
+    expect(resolveNativeBadgeText({ OMO_PACKAGE_DIR: dir })).toBe("(str Native)")
   })
 
   test("#given no runtime package dir, a missing manifest, or a malformed stamp #then the badge falls back to the cat", () => {

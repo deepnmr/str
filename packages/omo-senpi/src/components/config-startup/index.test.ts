@@ -222,10 +222,10 @@ describe("createConfigStartupComponent", () => {
     // then
     expect(notifications).toEqual([
       {
-        message: "OmO Native: migrated legacy configuration from /home/alice/.config/opencode/oh-my-openagent.jsonc",
+        message: "str Native: migrated legacy configuration from /home/alice/.config/opencode/oh-my-openagent.jsonc",
         type: "info",
       },
-      { message: "OmO Native: configuration diagnostics: JSONC parse error", type: "warning" },
+      { message: "str Native: configuration diagnostics: JSONC parse error", type: "warning" },
     ])
     expect(logs).toEqual([])
   })
@@ -253,11 +253,11 @@ describe("createConfigStartupComponent", () => {
     // then
     expect(notifications).toEqual([
       {
-        message: "OmO Native: migrated legacy configuration from /home/alice/.config/opencode/oh-my-openagent.jsonc",
+        message: "str Native: migrated legacy configuration from /home/alice/.config/opencode/oh-my-openagent.jsonc",
         type: "info",
       },
       {
-        message: "OmO Native: configuration migration: skipped: [opencode].model_fallback legacy=true kept=false",
+        message: "str Native: configuration migration: skipped: [opencode].model_fallback legacy=true kept=false",
         type: "warning",
       },
     ])
@@ -285,7 +285,7 @@ describe("createConfigStartupComponent", () => {
     await pi.dispatch("session_start", {})
 
     // then
-    expect(logs).toEqual(["warn:OmO Native: configuration diagnostics: Invalid omo config"])
+    expect(logs).toEqual(["warn:str Native: configuration diagnostics: Invalid omo config"])
   })
 
   test("#given a retired agents.momus key in omo.json #when session_start captures a UI #then nothing is reported about it", async () => {
@@ -355,7 +355,7 @@ describe("notificationMessages", () => {
 
     // then
     expect(notices).toEqual([{
-      message: "OmO Native: Devin does not serve devin/swe-2-low (categories.quick.model), devin/swe-2-high-lite (categories.deep-low.models[1]), devin/swe-2 (categories.writing.fallback_models[0]); SWE-2 runs as devin/swe-2-medium, devin/swe-2-high or devin/swe-2-max",
+      message: "str Native: Devin does not serve devin/swe-2-low (categories.quick.model), devin/swe-2-high-lite (categories.deep-low.models[1]), devin/swe-2 (categories.writing.fallback_models[0]); SWE-2 runs as devin/swe-2-medium, devin/swe-2-high or devin/swe-2-max",
       type: "warning",
     }])
   })
@@ -377,7 +377,7 @@ describe("notificationMessages", () => {
 
     // then
     expect(notices).toEqual([{
-      message: 'OmO Native: categories."plan-consultant" is not read for subagent_type "plan-consultant" spawns (categories only route task(category: ...)), so that agent runs its default model chain. Move the chain to the agent: "agents": { "plan-consultant": { "models": ["omo-mock/mock-1"] } }; categories."scout" is not read for subagent_type "scout" spawns (categories only route task(category: ...)), so that agent runs its default model chain. Move the chain to the agent: "agents": { "scout": { "models": ["omo-mock/mock-2"] } }',
+      message: 'str Native: categories."plan-consultant" is not read for subagent_type "plan-consultant" spawns (categories only route task(category: ...)), so that agent runs its default model chain. Move the chain to the agent: "agents": { "plan-consultant": { "models": ["omo-mock/mock-1"] } }; categories."scout" is not read for subagent_type "scout" spawns (categories only route task(category: ...)), so that agent runs its default model chain. Move the chain to the agent: "agents": { "scout": { "models": ["omo-mock/mock-2"] } }',
       type: "warning",
     }])
   })

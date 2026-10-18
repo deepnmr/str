@@ -18,6 +18,7 @@ import { DEVIN_SWE2_SERVED_LANES, isUnservedDevinSWE2Selector } from "@oh-my-ope
 import { categoryShadowedAgentNames, categoryShadowMessage } from "@oh-my-opencode/senpi-task/category-shadow"
 import type { ComponentContext, OmoSenpiComponent, SenpiExtensionAPI } from "../../extension/types"
 import { loadSenpiOmoConfig, type SenpiOmoConfigResult } from "../config-resolution"
+import { NATIVE_BRAND_NAME } from "../native-badge/brand"
 import { createOpenCodeRoutingNoticePlan } from "./opencode-routing-notice"
 
 export type SenpiStartupMigrationOptions = {
@@ -164,29 +165,29 @@ export function notificationMessages(
   config: SenpiOmoConfigResult,
 ): readonly StartupNotice[] {
   const messages: StartupNotice[] = []
-  if (migration.error !== undefined) messages.push({ message: `OmO Native: configuration migration: ${migration.error}`, type: "warning" })
+  if (migration.error !== undefined) messages.push({ message: `${NATIVE_BRAND_NAME}: configuration migration: ${migration.error}`, type: "warning" })
   else if (migration.migratedFrom.length > 0) messages.push({
-    message: `OmO Native: migrated legacy configuration from ${migration.migratedFrom.join(", ")}`,
+    message: `${NATIVE_BRAND_NAME}: migrated legacy configuration from ${migration.migratedFrom.join(", ")}`,
     type: "info",
   })
-  else if (migration.journalResumed) messages.push({ message: "OmO Native: recovered an interrupted configuration migration", type: "info" })
+  else if (migration.journalResumed) messages.push({ message: `${NATIVE_BRAND_NAME}: recovered an interrupted configuration migration`, type: "info" })
   const migrationDiagnostics = migration.results.flatMap((result) => result.diagnostics)
   if (migrationDiagnostics.length > 0) messages.push({
-    message: `OmO Native: configuration migration: ${migrationDiagnostics.join("; ")}`,
+    message: `${NATIVE_BRAND_NAME}: configuration migration: ${migrationDiagnostics.join("; ")}`,
     type: "warning",
   })
   if (config.diagnostics.length > 0) messages.push({
-    message: `OmO Native: configuration diagnostics: ${config.diagnostics.map((diagnostic) => diagnostic.message).join("; ")}`,
+    message: `${NATIVE_BRAND_NAME}: configuration diagnostics: ${config.diagnostics.map((diagnostic) => diagnostic.message).join("; ")}`,
     type: "warning",
   })
   const shadowed = categoryShadowedAgentNames(config.config)
   if (shadowed.length > 0) messages.push({
-    message: `OmO Native: ${shadowed.map((name) => categoryShadowMessage(config.config, name)).join("; ")}`,
+    message: `${NATIVE_BRAND_NAME}: ${shadowed.map((name) => categoryShadowMessage(config.config, name)).join("; ")}`,
     type: "warning",
   })
   const unserved = unservedDevinSelectors(config.config)
   if (unserved.length > 0) messages.push({
-    message: `OmO Native: Devin does not serve ${unserved.map((entry) => `${entry.selector} (${entry.path})`).join(", ")}; SWE-2 runs as ${servedDevinLanes()}`,
+    message: `${NATIVE_BRAND_NAME}: Devin does not serve ${unserved.map((entry) => `${entry.selector} (${entry.path})`).join(", ")}; SWE-2 runs as ${servedDevinLanes()}`,
     type: "warning",
   })
   return messages

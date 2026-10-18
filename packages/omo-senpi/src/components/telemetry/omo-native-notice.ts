@@ -4,13 +4,14 @@ import { join } from "node:path"
 import type { TelemetryDiagnosticInput, TelemetryEnv } from "@oh-my-opencode/telemetry-core"
 
 import type { ComponentContext, SenpiExtensionAPI } from "../../extension/types"
+import { NATIVE_BRAND_NAME } from "../native-badge/brand"
 import { isOmoNativeTelemetryEnabled } from "./omo-native-session"
 import { getOmoNativeStateDir } from "./product-identity"
 
 const SOURCE = "omo-native-notice"
 const MARKER_FILE_NAME = "notice-shown"
 const DOCS_URL = "https://github.com/code-yeongyu/oh-my-openagent/blob/dev/docs/reference/senpi-telemetry.md"
-const NOTICE = `OmO Native sends anonymous usage telemetry (no prompts, no paths). Docs: ${DOCS_URL} - opt out: DO_NOT_TRACK=1`
+const NOTICE = `${NATIVE_BRAND_NAME} sends anonymous usage telemetry (no prompts, no paths). Docs: ${DOCS_URL} - opt out: DO_NOT_TRACK=1`
 
 type NotificationUi = {
   notify(message: string, type?: "info" | "warning" | "error"): void

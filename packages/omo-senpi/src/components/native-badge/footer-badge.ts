@@ -1,9 +1,11 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
+import { NATIVE_BRAND_NAME } from "./brand"
+
 const NATIVE_BADGE_STATUS_KEY = "  omo-native"
-const NATIVE_BADGE_TEXT = "(😺 OmO Native by Q Kim)"
-const NATIVE_BADGE_DEV_BUILD_TEXT = "(☕ OmO Native by Q Kim)"
+const NATIVE_BADGE_TEXT = `(${NATIVE_BRAND_NAME})`
+const NATIVE_BADGE_DEV_BUILD_TEXT = `(${NATIVE_BRAND_NAME} dev)`
 
 interface NativeBadgeUi {
   setStatus(key: string, text: string | undefined): void

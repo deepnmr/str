@@ -1,6 +1,7 @@
 import type { ExtensionContext, SessionStartEvent } from "@code-yeongyu/senpi"
 
 import type { ComponentContext, OmoSenpiComponent, SenpiExtensionAPI } from "../../extension/types"
+import { NATIVE_BRAND_NAME } from "../native-badge/brand"
 import { getBuiltinSkillsRoot, getOmoNativeStateDir } from "../telemetry/product-identity"
 import { readAgentEndOutcome } from "../ulw-execute-continuation/agent-end-eligibility"
 import { claimOnboarding, isOnboardingComplete, releaseOnboarding } from "./state"
@@ -51,7 +52,7 @@ export function createOnboardingComponent(
       const showWelcome = (ctx: ExtensionContext): void => {
         if (ctx.mode !== "tui") return
         ctx.ui.setWidget("omo-onboarding", [
-          "Welcome to OmO. Ask anything.",
+          `Welcome to ${NATIVE_BRAND_NAME}. Ask anything.`,
           "Use ulw for full workflows.",
         ])
       }
