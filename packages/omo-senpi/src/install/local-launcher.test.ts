@@ -47,7 +47,27 @@ describe("local omo launcher", () => {
         expect(source).toContain("OMO_PLUGIN_ROOT")
         expect(source).toContain("OMO_CODING_AGENT_DIR")
         expect(source).toContain("SENPI_CODING_AGENT_DIR")
-        expect(source).toContain('join(homedir(), ".omo", "agent")')
+        expect(source).toContain('join(homedir(), ".omo"), "agent")')
+        expect(source).toContain("process.env.OMO_HOME_DIR?.trim() ? resolve(process.env.OMO_HOME_DIR)")
+      })
+
+      test("#then running it with OMO_HOME_DIR hands the engine that home's agent dir", () => {
+        const root = makeHome()
+        const capture = join(root, "capture.json")
+        const cli = join(root, "fake-cli.mjs")
+        writeFileSync(cli, `import { writeFileSync } from "node:fs"\nwriteFileSync(${JSON.stringify(capture)}, JSON.stringify({ agentDir: process.env.OMO_CODING_AGENT_DIR }))\n`)
+        const launcher = join(root, "launcher.mjs")
+        writeFileSync(launcher, renderLocalLauncher({ ...BASE, senpiCliPath: cli }))
+        const env: Record<string, string | undefined> = { ...process.env, HOME: root, OMO_HOME_DIR: join(root, ".str") }
+        delete env.OMO_CODING_AGENT_DIR
+        delete env.SENPI_CODING_AGENT_DIR
+        delete env.PI_CODING_AGENT_DIR
+
+        const result = Bun.spawnSync([process.execPath, launcher, "--version"], { env })
+
+        expect(result.exitCode).toBe(0)
+        expect(JSON.parse(readFileSync(capture, "utf8"))).toEqual({ agentDir: join(root, ".str", "agent") })
+        rmSync(root, { recursive: true, force: true })
       })
 
       test("#then a prerelease build stays on the beta channel", () => {

@@ -59,6 +59,64 @@ describe("resolveAgentHome", () => {
     })
   })
 
+  describe("#given OMO_HOME_DIR names a brand home", () => {
+    describe("#when that home holds a settings.json sentinel", () => {
+      test("#then the canonical agent directory under it is used", () => {
+        const brand = "/custom/omo-home"
+        const home = resolveAgentHome({
+          env: { OMO_HOME_DIR: brand },
+          homeDir: HOME,
+          exists: (path) => path === join(resolve(brand), "agent", AGENT_HOME_SENTINEL),
+        })
+
+        expect(home).toBe(join(resolve(brand), "agent"))
+      })
+
+      test("#then the flat home under it is used when only that sentinel exists", () => {
+        const brand = "/custom/omo-home"
+        const home = resolveAgentHome({
+          env: { OMO_HOME_DIR: brand },
+          homeDir: HOME,
+          exists: (path) => path === join(resolve(brand), AGENT_HOME_SENTINEL),
+        })
+
+        expect(home).toBe(resolve(brand))
+      })
+    })
+
+    describe("#when no sentinel exists under it", () => {
+      test("#then the engine layout under the real home is used, not the override", () => {
+        const home = resolveAgentHome({ env: { OMO_HOME_DIR: "/custom/omo-home" }, homeDir: HOME, exists: () => false })
+
+        expect(home).toBe(join(HOME, ".senpi", "agent"))
+      })
+    })
+
+    describe("#when OMO_CODING_AGENT_DIR is also set", () => {
+      test("#then the explicit agent directory still wins", () => {
+        const home = resolveAgentHome({
+          env: { OMO_HOME_DIR: "/custom/omo-home", OMO_CODING_AGENT_DIR: "/explicit/agent" },
+          homeDir: HOME,
+          exists: () => true,
+        })
+
+        expect(home).toBe(resolve("/explicit/agent"))
+      })
+    })
+
+    describe("#when OMO_HOME_DIR is blank", () => {
+      test("#then the branded home under the real home is used", () => {
+        const home = resolveAgentHome({
+          env: { OMO_HOME_DIR: "   " },
+          homeDir: HOME,
+          exists: (path) => path === join(HOME, ".omo", "agent", AGENT_HOME_SENTINEL),
+        })
+
+        expect(home).toBe(join(HOME, ".omo", "agent"))
+      })
+    })
+  })
+
   describe("#given the canonical branded agent directory holds engine state", () => {
     describe("#when no directory is configured", () => {
       test("#then it wins over the legacy flat home", () => {

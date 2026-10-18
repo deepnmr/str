@@ -37,7 +37,7 @@ export function resolveAgentHome(options: ResolveAgentHomeOptions): string {
     if (configured) return resolve(configured)
   }
 
-  const brandedHome = join(homeDir, ".omo")
+  const brandedHome = env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(homeDir, ".omo")
   const canonical = join(brandedHome, "agent")
   if (exists(join(canonical, AGENT_HOME_SENTINEL))) return canonical
   if (exists(join(brandedHome, AGENT_HOME_SENTINEL))) return brandedHome
