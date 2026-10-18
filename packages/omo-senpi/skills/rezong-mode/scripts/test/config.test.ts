@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterAll, afterEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,6 +7,7 @@ import { defaultConfig, env, fill, loadConfig, rezongHome } from "../src/config.
 import { withState } from "./fakes.ts";
 
 const state = withState();
+afterAll(() => state.done());
 afterEach(() => {
   delete process.env.DORI_STATE_DIR;
   delete process.env.REZONG_STATE_DIR;
