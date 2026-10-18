@@ -10,7 +10,9 @@ const CONTEXT7_URL = "https://mcp.context7.com/mcp"
 const CONTEXT7_API_KEY_ENV = "CONTEXT7_API_KEY"
 const GREP_APP_SERVER_NAME = "grep_app"
 const GREP_APP_URL = "https://mcp.grep.app"
-// Both servers are used in well under 1% of sessions while their schemas cost ~1.7K prompt tokens
+const KBSI_CRYSTAL_BANK_SERVER_NAME = "kbsi-crystal-bank"
+const KBSI_CRYSTAL_BANK_URL = "https://kbsi-crystal-bank.vercel.app/api/mcp"
+// These servers are used in well under 1% of sessions while their schemas cost ~1.7K prompt tokens
 // per request; search exposure keeps them out of the resident tool list until called by name.
 const DEFERRED_EXPOSURE = "search"
 
@@ -31,6 +33,14 @@ export function createBuiltinMcpsComponent(options: BuiltinMcpsComponentOptions 
       pi.registerMcpServer(GREP_APP_SERVER_NAME, {
         type: "http",
         url: GREP_APP_URL,
+        enabled: true,
+        auth: false,
+        lifecycle: "lazy",
+        exposure: DEFERRED_EXPOSURE,
+      })
+      pi.registerMcpServer(KBSI_CRYSTAL_BANK_SERVER_NAME, {
+        type: "http",
+        url: KBSI_CRYSTAL_BANK_URL,
         enabled: true,
         auth: false,
         lifecycle: "lazy",

@@ -16,6 +16,15 @@ const GREP_APP_DECLARATION = {
   exposure: "search",
 }
 
+const KBSI_CRYSTAL_BANK_DECLARATION = {
+  type: "http",
+  url: "https://kbsi-crystal-bank.vercel.app/api/mcp",
+  enabled: true,
+  auth: false,
+  lifecycle: "lazy",
+  exposure: "search",
+}
+
 const ANONYMOUS_CONTEXT7_DECLARATION = {
   type: "http",
   url: "https://mcp.context7.com/mcp",
@@ -61,6 +70,7 @@ describe("createBuiltinMcpsComponent", () => {
     expect(pi.mcpServers).toEqual([
       { name: "context7", config: ANONYMOUS_CONTEXT7_DECLARATION },
       { name: "grep_app", config: GREP_APP_DECLARATION },
+      { name: "kbsi-crystal-bank", config: KBSI_CRYSTAL_BANK_DECLARATION },
     ])
   })
 
@@ -87,6 +97,7 @@ describe("createBuiltinMcpsComponent", () => {
         },
       },
       { name: "grep_app", config: GREP_APP_DECLARATION },
+      { name: "kbsi-crystal-bank", config: KBSI_CRYSTAL_BANK_DECLARATION },
     ])
     expect(JSON.stringify(pi.mcpServers)).not.toContain("ctx7sk-live-secret")
   })

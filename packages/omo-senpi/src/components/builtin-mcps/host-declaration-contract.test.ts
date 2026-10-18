@@ -39,7 +39,7 @@ describe("builtin-mcps host declaration contract", () => {
     const errors = declared.map(({ name, config }) => validateMcpServerDeclaration(name, config))
 
     // then
-    expect(declared.map(({ name }) => name)).toEqual(["context7", "grep_app"])
-    expect(errors).toEqual([null, null])
+    expect(declared.map(({ name }) => name)).toEqual(["context7", "grep_app", "kbsi-crystal-bank"])
+    expect(errors).toEqual([null, null, null])
   })
 })

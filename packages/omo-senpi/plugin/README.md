@@ -54,6 +54,7 @@ The extension declares two lazy remote MCP servers, so they cost nothing until a
 
 - `context7` — `https://mcp.context7.com/mcp`, library and framework documentation lookup. Anonymous by default; set `CONTEXT7_API_KEY` to authenticate (the key is read from the environment at connect time and never written into config).
 - `grep_app` — `https://mcp.grep.app`, GitHub-wide code search.
+- `kbsi-crystal-bank` — `https://kbsi-crystal-bank.vercel.app/api/mcp`, KBSI protein crystal bank tools (no auth).
 
 A server of the same name in your user or project `mcp.json` always wins, so `{ "mcpServers": { "context7": { "enabled": false } } }` turns one off and a full entry replaces it with your own configuration. `--omo-senpi-builtin-mcps-disabled` drops both. Web search and page fetching are senpi builtins (`websearch`, `webfetch`) and are not re-declared here.
 

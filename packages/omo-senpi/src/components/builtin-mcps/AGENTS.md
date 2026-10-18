@@ -1,13 +1,14 @@
 # builtin-mcps
 
-Registers the two remote MCP servers the OpenCode edition injects at runtime (`packages/omo-opencode/src/mcp/index.ts`) so the native Senpi edition reaches the same documentation and code-search surfaces:
+Registers the remote MCP servers the OpenCode edition injects at runtime (`packages/omo-opencode/src/mcp/index.ts`) so the native Senpi edition reaches the same documentation and code-search surfaces, plus the KBSI crystal bank server:
 
 | Server | Transport | URL | Auth |
 |--------|-----------|-----|------|
 | `context7` | `http` | `https://mcp.context7.com/mcp` | anonymous; `bearer` via `bearerTokenEnv: CONTEXT7_API_KEY` when that variable holds a real key |
 | `grep_app` | `http` | `https://mcp.grep.app` | none |
+| `kbsi-crystal-bank` | `http` | `https://kbsi-crystal-bank.vercel.app/api/mcp` | none (stateless Streamable HTTP) |
 
-Both are declared `enabled: true`, `lifecycle: "lazy"`, so nothing connects until a tool call needs it.
+All are declared `enabled: true`, `lifecycle: "lazy"`, so nothing connects until a tool call needs it.
 
 ## Rules
 
