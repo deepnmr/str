@@ -1,3 +1,9 @@
+# str
+str is a modified fork of oh-my-openagent for free non-commercial use. See [NOTICE-FORK.md](./NOTICE-FORK.md) for details.
+Install it from source:
+`bun run build:omo-native && (cd packages/omo-native && npm pack) && npm i -g ./packages/omo-native/deepnmr-str-*.tgz`
+---
+
 > [!NOTE]
 > **OmO 5.0: OmO ❤️ Pi**
 > Install it with `curl -fsSL https://get.omo.dev/install.sh | bash`. Memory system, CodeMode, Anthropic subscriptions, all covered.
