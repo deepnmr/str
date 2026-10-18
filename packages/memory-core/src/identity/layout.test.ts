@@ -42,6 +42,23 @@ describe("defaultMemoryRoot", () => {
     // then
     expect(root).toBe(join(homedir(), ".omo", "memory"))
   })
+
+  it("#given OMO_HOME_DIR #when the default root is computed #then it is <OMO_HOME_DIR>/memory and the env is restored", () => {
+    // given
+    const previous = process.env.OMO_HOME_DIR
+    const omoHome = join(tmpdir(), "qa-omo-home")
+    process.env.OMO_HOME_DIR = omoHome
+    try {
+      // when
+      const root = defaultMemoryRoot()
+      // then
+      expect(root).toBe(join(omoHome, "memory"))
+    } finally {
+      if (previous === undefined) delete process.env.OMO_HOME_DIR
+      else process.env.OMO_HOME_DIR = previous
+    }
+    expect(process.env.OMO_HOME_DIR).toBe(previous)
+  })
 })
 
 describe("resolveMemoryRoot", () => {
@@ -62,6 +79,16 @@ describe("resolveMemoryRoot", () => {
     const root = resolveMemoryRoot(env, "/work/proj")
     // then (Windows qualifies the drive; resolve() is the platform semantics the impl applies)
     expect(root).toBe(resolve("/work/proj", "qa-home"))
+  })
+
+  it("#given OMO_MEMORY_HOME and OMO_HOME_DIR both set #when the root is resolved #then OMO_MEMORY_HOME wins", () => {
+    // given
+    const overrideRoot = join(tmpdir(), "qa-memory-home")
+    const env = { [MEMORY_ROOT_ENV_VAR]: overrideRoot, OMO_HOME_DIR: join(tmpdir(), "qa-omo-home") }
+    // when
+    const root = resolveMemoryRoot(env, "/work/proj")
+    // then
+    expect(root).toBe(overrideRoot)
   })
 
   it("#given an empty or whitespace OMO_MEMORY_HOME #when the root is resolved #then the default root is used", () => {

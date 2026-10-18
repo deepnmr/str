@@ -287,14 +287,17 @@ export function staleEngineReport(options) {
 // Mirrors memory-core's layout: OMO_MEMORY_HOME (relative to cwd) else ~/.omo/memory, identities
 // under agents/<id>, one-shot run roots under transient-runs/<token>.
 const MEMORY_ROOT_ENV_VAR = "OMO_MEMORY_HOME"
+const OMO_HOME_DIR_ENV_VAR = "OMO_HOME_DIR"
 const MEMORY_AGENTS_DIRNAME = "agents"
 const MEMORY_TRANSIENT_DIRNAME = "transient-runs"
 const MEMORY_REPO_DIRNAME = "repo"
 
 function memoryRoot(env) {
   const override = env[MEMORY_ROOT_ENV_VAR]
-  if (override === undefined || override.trim() === "") return join(homedir(), ".omo", "memory")
-  return resolve(process.cwd(), override)
+  if (override !== undefined && override.trim() !== "") return resolve(process.cwd(), override)
+  const omoHome = env[OMO_HOME_DIR_ENV_VAR]
+  if (omoHome !== undefined && omoHome.trim() !== "") return join(resolve(omoHome), "memory")
+  return join(homedir(), ".omo", "memory")
 }
 
 // An unreadable or absent directory is `undefined`, never an empty list: the report must stay

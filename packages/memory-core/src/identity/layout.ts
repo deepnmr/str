@@ -6,6 +6,7 @@ import { homedir } from "node:os"
 import { join, resolve } from "node:path"
 
 export const MEMORY_ROOT_ENV_VAR = "OMO_MEMORY_HOME"
+const OMO_HOME_DIR_ENV_VAR = "OMO_HOME_DIR"
 export const AGENTS_DIRNAME = "agents"
 export const REPO_DIRNAME = "repo"
 export const RUNTIME_DIRNAME = "runtime"
@@ -45,6 +46,10 @@ export interface MemoryIdentityPaths {
 }
 
 export function defaultMemoryRoot(): string {
+  const omoHome = process.env[OMO_HOME_DIR_ENV_VAR]
+  if (omoHome !== undefined && omoHome.trim() !== "") {
+    return join(resolve(omoHome), "memory")
+  }
   return join(homedir(), ".omo", "memory")
 }
 
