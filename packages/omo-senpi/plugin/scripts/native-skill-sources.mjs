@@ -52,6 +52,10 @@ export function createNativeSkillSources(repoRoot) {
       source: join(nativeSkillsRoot, "onboarding"),
     },
     {
+      name: "rezong-mode",
+      source: join(nativeSkillsRoot, "rezong-mode"),
+    },
+    {
       name: "ultrawork",
       source: join(nativeSkillsRoot, "ultrawork"),
     },

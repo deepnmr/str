@@ -4,7 +4,7 @@
 
 ## Shipped skills
 
-The plugin ships 19 skills by default:
+The plugin ships 20 skills by default:
 
 - `ast-grep` — structural code search and rewrites
 - `coding-agent-sessions` — find, read, and reconstruct coding-agent session transcripts
@@ -18,6 +18,7 @@ The plugin ships 19 skills by default:
 - `refactor` — safe refactoring and code quality improvement
 - `remove-ai-slops` — clean AI-generated code smells
 - `review-work` — multi-angle implementation and PR review
+- `rezong-mode` — always-on messenger agent that runs work in tracked herdr sessions
 - `ultimate-browsing` — escalation browsing for blocked or hard-to-reach pages
 - `ultrawork` — ultrawork mode directive
 - `ulw-execute` — execute a ulw-plan work plan with Boulder state
