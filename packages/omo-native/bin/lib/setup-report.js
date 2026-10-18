@@ -1,3 +1,5 @@
+import { COMMAND } from "./brand.js"
+
 function values(items) {
   return items.length > 0 ? items.join(", ") : "none"
 }
@@ -18,7 +20,7 @@ export function formatSetupReport(inventory) {
     }
   }
   if (inventory.harnesses.some((item) => item.id !== "senpi" && item.importableCount > 0)) {
-    lines.push("Run `omo setup --yes` to import available API credentials.")
+    lines.push(`Run \`${COMMAND} setup --yes\` to import available API credentials.`)
   }
   return `${lines.join("\n")}\n`
 }

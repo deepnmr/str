@@ -12,6 +12,7 @@ import { needsSetupSuggestion, type detectHarnesses } from "./bin/lib/setup-dete
 import { compiledDiagnosticRuntimeLoader, loadCompiledCoverageEngine } from "./compiled-diagnostic-runtime"
 import { configDoctorLines } from "./config-doctor-runtime"
 import { claudeCodeDoctorLines } from "./claude-code-doctor"
+import { COMMAND } from "./bin/lib/brand.js"
 
 type DaemonEngine = { run(args: string[], options: { env: Record<string, string | undefined> }): { exitCode: number; stdout: string; stderr: string } }
 
@@ -97,7 +98,7 @@ export async function runCompiledDoctor(input: CompiledDoctorInput): Promise<voi
   const [computerUse, coverage] = await Promise.all([computerUseLines(input, env), coverageLines(input, env)])
   if (computerUse.some((line) => line.startsWith("FAIL "))) failed = true
   lines.push(...computerUse, ...claudeCodeDoctorLines({ runtimeDir: input.execDir, env }), ...coverage)
-  if (needsSetupSuggestion(input.inventory)) lines.push("INFO no credentials found; run omo setup to review sibling stores")
+  if (needsSetupSuggestion(input.inventory)) lines.push(`INFO no credentials found; run ${COMMAND} setup to review sibling stores`)
   console.log(lines.join("\n"))
   process.exitCode = failed ? 1 : 0
 }

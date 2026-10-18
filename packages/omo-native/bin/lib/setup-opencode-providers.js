@@ -10,6 +10,7 @@ import { join } from "node:path"
 import { literalConfigValue } from "./auth-store.js"
 import { convertPlaceholders, opencodeConfigSources, readOpencodeSection, unconvertedPlaceholder } from "./setup-opencode-assets.js"
 import providerMap from "./provider-map.json" with { type: "json" }
+import { COMMAND } from "./brand.js"
 
 // The AI SDK package an OpenCode provider names decides its wire protocol; each engine api id here
 // speaks the same one (pi-ai compat.js BUILTIN_APIS). Any other package is reported, never guessed.
@@ -231,7 +232,7 @@ function withCatalog(config, opencodeAuth, builtin, home, env, notices) {
   const catalog = readOpencodeCatalog(home, env, ids.some((id) => !ownEndpoint(id)) ? notices : [])
   if (catalog === undefined) {
     const missing = ids.filter((id) => !Object.hasOwn(config, id))
-    if (missing.length > 0) notices.push(`NOTICE opencode: no models.dev catalog cache found, so ${missing.join(", ")} could not be described - if opencode serves them, run opencode once, then omo setup again`)
+    if (missing.length > 0) notices.push(`NOTICE opencode: no models.dev catalog cache found, so ${missing.join(", ")} could not be described - if opencode serves them, run opencode once, then ${COMMAND} setup again`)
     return config
   }
   const merged = { ...config }

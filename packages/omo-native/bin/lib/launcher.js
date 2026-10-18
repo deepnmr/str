@@ -350,7 +350,7 @@ export async function runLauncher(args = process.argv.slice(2)) {
   if (isInteractiveDefault(args)) {
     notice(releaseBanner())
     if (process.stdout.isTTY === true && setupSuggestionForLaunch()) {
-      notice("omo: sibling credentials detected; run `omo setup` to review them")
+      notice(`${COMMAND}: sibling credentials detected; run \`${COMMAND} setup\` to review them`)
     }
   }
   await spawnSenpi(args, true)

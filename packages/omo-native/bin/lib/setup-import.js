@@ -16,6 +16,7 @@ import { planOpencodeProviders } from "./setup-opencode-providers.js"
 import { applyProviders, planProviders, providerCounts, providerPlanLines, providerQuestion } from "./setup-providers-import.js"
 import { applyModelChoices, modelChoiceCounts, modelChoicePlanLines, modelChoiceQuestion, planModelChoices } from "./setup-model-choices-import.js"
 import { displayPath, formatSetupSummary, TELEMETRY_NOTICE } from "./setup-summary.js"
+import { COMMAND } from "./brand.js"
 
 function write(lines) {
   if (lines.length > 0) process.stdout.write(`${lines.join("\n")}\n`)
@@ -24,7 +25,7 @@ function write(lines) {
 async function ask(question, options, defaultYes) {
   if (options.yes) return true
   if (options.stdin?.isTTY !== true || options.stdout?.isTTY !== true) {
-    process.stdout.write("Non-interactive setup did not import. Re-run with `omo setup --yes`.\n")
+    process.stdout.write(`Non-interactive setup did not import. Re-run with \`${COMMAND} setup --yes\`.\n`)
     return false
   }
   process.stdout.write(question)

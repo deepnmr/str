@@ -133,7 +133,7 @@ async function waitForCache(
 }
 
 /** One sibling credential store the suggestion fires on, with no engine credentials of its own. */
-function installSibling(fixture: Fixture, content = "{}") {
+function installSibling(fixture: Fixture, content = '{"openai":{"type":"api","key":"OPENCODE-SECRET"}}') {
   write(join(fixture.xdg, "opencode", "auth.json"), content)
 }
 
@@ -154,7 +154,7 @@ describe("setup suggestion cache", () => {
       const fixture = createFixture()
       installSibling(fixture)
       write(fixture.cachePath, `${JSON.stringify(freshEntry(fixture, true))}\n`)
-      installSibling(fixture, '{"changed":true}')
+      installSibling(fixture, '{"openai":{"type":"api","key":"OPENCODE-SECRET"},"changed":{"type":"api"}}')
       expect(readSetupSuggestionCache(fixture.env, fixture.home)).toEqual({ suggestion: true, fresh: false })
     })
 
@@ -208,7 +208,7 @@ describe("setup suggestion cache", () => {
 
       expect(result.status).toBe(0)
       const output = `${result.stdout}${result.stderr}`
-      expect(output.match(/sibling credentials detected; run `omo setup`/g)?.length).toBe(1)
+      expect(output.match(/sibling credentials detected; run `str setup`/g)?.length).toBe(1)
       expect(readFileSync(fixture.cachePath, "utf8")).toBe(before)
       expect(readFileSync(fixture.captureFile, "utf8")).toBe("spawned")
       expect(readdirSync(fixture.agentDir).sort()).toEqual([CACHE_FILENAME])
@@ -231,7 +231,7 @@ describe("setup suggestion cache", () => {
       const warm = runLauncher(fixture, [], true)
       const output = `${warm.stdout}${warm.stderr}`
       expect(warm.status).toBe(0)
-      expect(output.match(/sibling credentials detected; run `omo setup`/g)?.length).toBe(1)
+      expect(output.match(/sibling credentials detected; run `str setup`/g)?.length).toBe(1)
       expect(readdirSync(fixture.agentDir).sort()).toEqual([CACHE_FILENAME])
     })
 
@@ -250,14 +250,14 @@ describe("setup suggestion cache", () => {
       const fixture = createFixture()
       installSibling(fixture)
       write(fixture.cachePath, `${JSON.stringify(freshEntry(fixture, true))}\n`)
-      installSibling(fixture, '{"changed":true}')
+      installSibling(fixture, '{"openai":{"type":"api","key":"OPENCODE-SECRET"},"changed":{"type":"api"}}')
       const before = readFileSync(fixture.cachePath, "utf8")
 
       const stale = runLauncher(fixture, [], true)
 
       expect(stale.status).toBe(0)
       const output = `${stale.stdout}${stale.stderr}`
-      expect(output.match(/sibling credentials detected; run `omo setup`/g)?.length).toBe(1)
+      expect(output.match(/sibling credentials detected; run `str setup`/g)?.length).toBe(1)
       expect(readFileSync(fixture.captureFile, "utf8")).toBe("spawned")
       const current = JSON.stringify(setupDetectInputStats(fixture.env, fixture.home))
       await waitForCache(fixture, (entry) => JSON.stringify(entry.inputs) === current && entry.suggestion === true,
@@ -278,7 +278,7 @@ describe("setup suggestion cache", () => {
       const result = runLauncher(fixture, ["doctor"])
 
       expect(result.status).toBe(0)
-      expect(result.stdout).toContain("INFO no credentials found; run omo setup to review sibling stores")
+      expect(result.stdout).toContain("INFO no credentials found; run str setup to review sibling stores")
       expect(readFileSync(fixture.cachePath, "utf8")).toBe(before)
     })
 

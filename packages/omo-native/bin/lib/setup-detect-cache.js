@@ -18,7 +18,9 @@ import { detectedFilePaths } from "./setup-detect.js"
 export const CACHE_FILENAME = "harness-detect-cache.json"
 
 /** Bumped whenever the cache shape changes, so old entries read as misses. */
-export const CACHE_VERSION = 1
+// 2: the suggestion now needs a sibling holding credentials and this install having no provider;
+// a version-1 answer was computed under the older rule and must not survive the upgrade.
+export const CACHE_VERSION = 2
 
 // The fingerprint already covers every file detection reads, so the TTL only bounds how long a
 // fingerprint-matched answer survives a change in detection itself (an omo update, node:sqlite

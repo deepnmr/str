@@ -202,7 +202,7 @@ describe("omo setup sibling detection", () => {
         "opencode | yes | open-api, open-oauth | api, oauth | none",
         "oh-my-pi | yes | omp-api, omp-disabled | api_key, oauth | models.db: yes",
         "gajae-code | yes | gjc-oauth | oauth | enabledModels: fixture-one, fixture-two; modelRoles: default, fast",
-        "Run `omo setup --yes` to import available API credentials.",
+        "Run `str setup --yes` to import available API credentials.",
         "",
       ].join("\n"))
       for (const secret of SECRET_SENTINELS) expect(report).not.toContain(secret)
@@ -269,7 +269,7 @@ describe("omo setup sibling detection", () => {
   describe("#given no credentials found and a sibling is installed", () => {
     test("#when suggestion state is checked #then only that exact condition is true", async () => {
       const fixture = createFixture()
-      write(join(fixture.xdg, "opencode", "auth.json"), "{}")
+      write(join(fixture.xdg, "opencode", "auth.json"), JSON.stringify({ openai: { type: "api", key: "OPENCODE-SECRET" } }))
       expect(needsSetupSuggestion(await detect(fixture))).toBe(true)
       write(join(fixture.agentDir, "auth.json"), JSON.stringify({ senpi: { type: "api_key", key: "SENPI-SECRET" } }))
       expect(needsSetupSuggestion(await detect(fixture))).toBe(false)
@@ -278,13 +278,27 @@ describe("omo setup sibling detection", () => {
       expect(needsSetupSuggestion(await detect(fixture))).toBe(false)
     })
 
+    test("#given a sibling that is installed but stores nothing #when suggestion state is checked #then setup is not suggested", async () => {
+      const fixture = createFixture()
+      write(join(fixture.xdg, "opencode", "auth.json"), "{}")
+      expect(needsSetupSuggestion(await detect(fixture))).toBe(false)
+    })
+
+    test("#given a custom provider such as opencodex in models.json #when a sibling holds credentials #then setup is not suggested", async () => {
+      const fixture = createFixture()
+      write(join(fixture.xdg, "opencode", "auth.json"), JSON.stringify({ openai: { type: "api", key: "OPENCODE-SECRET" } }))
+      expect(needsSetupSuggestion(await detect(fixture))).toBe(true)
+      write(join(fixture.agentDir, "models.json"), JSON.stringify({ providers: { opencodex: { baseUrl: "http://127.0.0.1:10100/v1", models: [] } } }))
+      expect(needsSetupSuggestion(await detect(fixture))).toBe(false)
+    })
+
     test("#when doctor runs #then the INFO line fires only while the engine store is empty", () => {
       const fixture = createFixture()
       const launcher = createLauncherFixture(fixture)
-      write(join(fixture.xdg, "opencode", "auth.json"), "{}")
+      write(join(fixture.xdg, "opencode", "auth.json"), '{"openai":{"type":"api","key":"OPENCODE-SECRET"}}')
       let result = runLauncher(launcher, fixture, ["doctor"])
       expect(result.status).toBe(0)
-      expect(result.stdout).toContain("INFO no credentials found; run omo setup to review sibling stores")
+      expect(result.stdout).toContain("INFO no credentials found; run str setup to review sibling stores")
       write(join(fixture.agentDir, "auth.json"), JSON.stringify({ senpi: { type: "api_key", key: "SENPI-SECRET" } }))
       result = runLauncher(launcher, fixture, ["doctor"])
       expect(result.stdout).not.toContain("INFO no credentials found")
@@ -293,9 +307,9 @@ describe("omo setup sibling detection", () => {
     test.skipIf(process.platform === "win32")("#when default launch is on a TTY #then the hint is answered from the cache, cold first then warm", async () => {
       const fixture = createFixture()
       const launcher = createLauncherFixture(fixture)
-      write(join(fixture.xdg, "opencode", "auth.json"), "{}")
+      write(join(fixture.xdg, "opencode", "auth.json"), '{"openai":{"type":"api","key":"OPENCODE-SECRET"}}')
       const nonTty = runLauncher(launcher, fixture, [])
-      expect(`${nonTty.stdout}${nonTty.stderr}`).not.toContain("run `omo setup`")
+      expect(`${nonTty.stdout}${nonTty.stderr}`).not.toContain("run `str setup`")
       // Cold cache: the first interactive launch must not block on live detection; it answers from
       // the empty default and kicks off the detached refresh that writes the cache.
       const cold = runLauncher(launcher, fixture, [], true)
@@ -308,7 +322,7 @@ describe("omo setup sibling detection", () => {
       const tty = runLauncher(launcher, fixture, [], true)
       const output = `${tty.stdout}${tty.stderr}`
       expect(tty.status).toBe(0)
-      expect(output.match(/sibling credentials detected; run `omo setup`/g)?.length).toBe(1)
+      expect(output.match(/sibling credentials detected; run `str setup`/g)?.length).toBe(1)
       write(join(fixture.agentDir, "auth.json"), JSON.stringify({ senpi: { type: "api_key", key: "SENPI-SECRET" } }))
       // Stale fingerprint: this launch still answers from the cache (the one-launch staleness the
       // design accepts), then the refresh child catches the cache up.

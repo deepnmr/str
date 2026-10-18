@@ -55,6 +55,7 @@ function readSenpiModels(path, result) {
     const providers = parsed?.providers
     if (providers !== null && typeof providers === "object" && !Array.isArray(providers)) {
       const ids = sorted(Object.keys(providers))
+      result.modelProviderCount = ids.length
       result.modelHint = ids.length > 0 ? `providers: ${ids.join(", ")}` : "providers: none"
     }
   } catch (error) {
@@ -181,8 +182,15 @@ export async function detectHarnesses(options = {}) {
   }
 }
 
+/**
+ * Setup is worth suggesting only when it has something to offer and this install has nothing to run
+ * on: no credential and no custom provider (an opencodex loopback provider in models.json needs no
+ * credential), while a sibling store actually holds credentials. A sibling that is merely installed
+ * with nothing stored gives setup nothing to review.
+ */
 export function needsSetupSuggestion(inventory) {
   const senpi = inventory.harnesses.find((item) => item.id === "senpi")
-  const siblingInstalled = inventory.harnesses.some((item) => item.id !== "senpi" && item.installed)
-  return (senpi?.entryCount ?? 0) === 0 && siblingInstalled
+  const configured = (senpi?.entryCount ?? 0) > 0 || (senpi?.modelProviderCount ?? 0) > 0
+  const siblingHasCredentials = inventory.harnesses.some((item) => item.id !== "senpi" && item.installed && item.entryCount > 0)
+  return !configured && siblingHasCredentials
 }

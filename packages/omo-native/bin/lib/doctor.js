@@ -10,6 +10,7 @@ import { migrationReport } from "./doctor-migration.js"
 import { launchSpecDoctorLines } from "./launch-spec-mode.js"
 import { piConfigReport } from "./doctor-pi-config.js"
 import { needsSetupSuggestion } from "./setup-detect.js"
+import { COMMAND } from "./brand.js"
 
 export function installedDistTag(version) {
   return releaseChannel(version)
@@ -433,7 +434,7 @@ export function runDoctor(inventory, args = [], options = {}) {
   if ((options.computerUse ?? []).some((line) => line.startsWith("FAIL "))) failed = true
   if ((options.gateway ?? []).some((line) => line.startsWith("FAIL "))) failed = true
   if (needsSetupSuggestion(inventory)) {
-    lines.push("INFO no credentials found; run omo setup to review sibling stores")
+    lines.push(`INFO no credentials found; run ${COMMAND} setup to review sibling stores`)
   }
   console.log(lines.join("\n"))
   process.exitCode = failed ? 1 : 0
