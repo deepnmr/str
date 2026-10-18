@@ -28,8 +28,8 @@ function createFixture(installLayout: InstallLayout = "npm"): Fixture {
   const root = mkdtempSync(join(tmpdir(), "omo-doctor-edition-"))
   roots.push(root)
   const packagePath = installLayout === "bun"
-    ? join(root, "custom-bun", "install", "global", "node_modules", "omo-ai")
-    : join(root, "prefix", "lib", "node_modules", "omo-ai")
+    ? join(root, "custom-bun", "install", "global", "node_modules", "@deepnmr", "str")
+    : join(root, "prefix", "lib", "node_modules", "@deepnmr", "str")
   mkdirSync(packagePath, { recursive: true })
   // realpathSync.native returns the long canonical name on Windows (GetFinalPathNameByHandle); the JS
   // realpath keeps 8.3 aliases such as RUNNER~1, while the child resolves its own import.meta.url to the
@@ -37,7 +37,7 @@ function createFixture(installLayout: InstallLayout = "npm"): Fixture {
   const packageRoot = realpathSync.native(packagePath)
   cpSync(join(SOURCE_ROOT, "bin"), join(packageRoot, "bin"), { recursive: true })
   writeFile(join(packageRoot, "package.json"), JSON.stringify({
-    name: "omo-ai",
+    name: "@deepnmr/str",
     version: "5.0.0-0.beta.51",
     type: "module",
     dependencies: { "@code-yeongyu/senpi": "2026.8.9" },
@@ -135,8 +135,8 @@ describe("omo doctor edition summary", () => {
       expect(result.status).toBe(0)
       const summary = editionLine(result.stdout)
       expect(summary).toMatch(/^INFO omo · Edition: Native · Installed: 5\.0\.0-0\.beta\.51 \(engine: senpi 2026\.8\.9\) · Latest: /)
-      expect(lineAfter(result.stdout, summary)).toBe("INFO Update: npm i -g omo-ai@beta")
-      expect(updateTarget(fixture.packageRoot).command).toBe("npm i -g omo-ai@beta")
+      expect(lineAfter(result.stdout, summary)).toBe("INFO Update: npm i -g @deepnmr/str@beta")
+      expect(updateTarget(fixture.packageRoot).command).toBe("npm i -g @deepnmr/str@beta")
     })
 
     test("#then a Bun-managed install prints the bun update command for that layout", () => {
@@ -194,7 +194,7 @@ describe("omo doctor edition summary", () => {
       expect(calls[0]?.cmd).toBe(process.execPath)
       expect(calls[0]?.args[0]).toBe("-e")
       expect(calls[0]?.args[1]).toContain("registry.npmjs.org")
-      expect(calls[0]?.args[1]).toContain("omo-ai")
+      expect(calls[0]?.args[1]).toContain("@deepnmr%2Fstr")
       expect(calls[0]?.args[1]).toContain("dist-tags")
       expect(calls[0]?.opts.timeout).toBeGreaterThan(0)
       expect(calls[0]?.opts.timeout).toBeLessThanOrEqual(10_000)

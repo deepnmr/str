@@ -1,4 +1,5 @@
 import { join } from "node:path"
+import { COMMAND, PACKAGE_NAME } from "./brand.js"
 import { runChild } from "./child-process.js"
 import { fetchNpmDistTagsSync } from "./npm-dist-tags.js"
 import { channelDistTagVersion, channelPackageSpec, packageManifest, readJson, releaseChannel, resolveSenpi, updateTarget } from "./package-paths.js"
@@ -7,7 +8,7 @@ import { isPrintOnlyUpdate, updateUsageAnswer } from "./update-args.js"
 export { isPrintOnlyUpdate }
 
 export function formatUpdateCommand(update) {
-  return `omo is updated via ${update.manager}: ${update.command}`
+  return `${COMMAND} is updated via ${update.manager}: ${update.command}`
 }
 
 export function readInstalledVersion() {
@@ -21,7 +22,7 @@ export function readInstalledVersion() {
 }
 
 export function formatVersionChange(before, after) {
-  return `omo ${before.omo} -> ${after.omo} (engine: senpi ${after.engine})`
+  return `${COMMAND} ${before.omo} -> ${after.omo} (engine: senpi ${after.engine})`
 }
 
 /**
@@ -73,14 +74,14 @@ export async function runSelfUpdate(args, options = {}) {
   const update = resolveUpdate(target)
 
   if (target === undefined) {
-    log(`omo: could not confirm the ${channel} omo-ai version from the npm registry; installing the unpinned ${channelPackageSpec(before.omo)}`)
+    log(`${COMMAND}: could not confirm the ${channel} ${PACKAGE_NAME} version from the npm registry; installing the unpinned ${channelPackageSpec(before.omo)}`)
   }
   if (isPrintOnlyUpdate(args)) {
     log(formatUpdateCommand(update))
     return 0
   }
   if (target !== undefined && target === before.omo) {
-    log(`omo ${before.omo} is up to date (omo-ai@${channel} is ${target})`)
+    log(`${COMMAND} ${before.omo} is up to date (${PACKAGE_NAME}@${channel} is ${target})`)
     return 0
   }
   log(formatUpdateCommand(update))
@@ -94,19 +95,19 @@ export async function runSelfUpdate(args, options = {}) {
       env: { ...env, ...update.env },
     })
   } catch {
-    error(`omo: update failed; retry with: ${update.command}`)
+    error(`${COMMAND}: update failed; retry with: ${update.command}`)
     return 1
   }
 
   if (result.signal || (result.status ?? 1) !== 0) {
-    error(`omo: update failed; retry with: ${update.command}`)
+    error(`${COMMAND}: update failed; retry with: ${update.command}`)
     return result.status ?? 1
   }
 
   const after = readInstalled()
   if (target !== undefined && after.omo !== target) {
-    error(`omo is still ${after.omo}; ${target} is published`)
-    error(`omo: update failed; retry with: ${update.command}`)
+    error(`${COMMAND} is still ${after.omo}; ${target} is published`)
+    error(`${COMMAND}: update failed; retry with: ${update.command}`)
     return 1
   }
   log(formatVersionChange(before, after))

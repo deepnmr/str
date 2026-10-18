@@ -71,7 +71,7 @@ describe("interactive launch banner styling (#8442)", () => {
     // then
     expect(result.status).toBe(0)
     const output = `${result.stdout}${result.stderr}`
-    expect(output).toContain("omo (omo-ai beta 1.2.3-test.0)")
+    expect(output).toContain("str (@deepnmr/str beta 1.2.3-test.0)")
     expect(output).not.toContain(ANSI_RED)
     expect(readFileSync(fixture.captureFile, "utf8")).toBe("spawned")
   })

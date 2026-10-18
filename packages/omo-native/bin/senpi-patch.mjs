@@ -27,7 +27,7 @@ try {
     if (senpiRoot === undefined) throw new Error("package root not found in module graph")
   }
 } catch (error) {
-  throw new Error("omo-ai: unable to resolve the installed @code-yeongyu/senpi package", { cause: error })
+  throw new Error("@deepnmr/str: unable to resolve the installed @code-yeongyu/senpi package", { cause: error })
 }
 
 preparePluginLaunchSpec({ pluginRoot: join(packageRoot, "plugin") })

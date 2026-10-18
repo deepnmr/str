@@ -70,11 +70,11 @@ function createFixture(): Fixture {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "omo-bin-shim-")))
   roots.push(root)
   const bunInstall = join(root, "buninstall")
-  const packageRoot = join(bunInstall, "install", "global", "node_modules", "omo-ai")
+  const packageRoot = join(bunInstall, "install", "global", "node_modules", "@deepnmr", "str")
   mkdirSync(join(packageRoot, "bin"), { recursive: true })
   cpSync(join(SOURCE_ROOT, "bin"), join(packageRoot, "bin"), { recursive: true })
   writeFileSync(join(packageRoot, "package.json"), JSON.stringify({
-    name: "omo-ai",
+    name: "@deepnmr/str",
     version: "9.9.9-test.0",
     type: "module",
     dependencies: { "@code-yeongyu/senpi": "2026.8.9" },
@@ -103,14 +103,14 @@ process.exit(Number(process.env.FAKE_EXIT ?? 0))
   const bunBinary = join(bunInstall, "bin", "bun")
   mkdirSync(join(bunInstall, "bin"), { recursive: true })
   writeFileSync(bunBinary, `#!/bin/sh\nif [ "$1" = "--version" ]; then echo 1.4.2; exit 0; fi\nprintf fake-bun-ran > '${markerFile}'\nexit 42\n`, { mode: 0o755 })
-  symlinkSync(stockLinkTarget(), join(bunInstall, "bin", "omo"))
+  symlinkSync(stockLinkTarget(), join(bunInstall, "bin", "str"))
   mkdirSync(join(root, "home"), { recursive: true })
   return {
     root,
     bunInstall,
     packageRoot,
     launcher: join(packageRoot, "bin", "str.js"),
-    binPath: join(bunInstall, "bin", "omo"),
+    binPath: join(bunInstall, "bin", "str"),
     bunBinary,
     captureFile,
     markerFile,
@@ -201,7 +201,7 @@ describe("bun launcher bin shim", () => {
       // given: bun is the runtime - bun's postinstall on a machine without node, or `bun omo.js`
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir, bunPath } = baseInput(scriptPath, { versions: { bun: "1.4.2" } })
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       // when
@@ -219,7 +219,7 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       // when
@@ -242,7 +242,7 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const fs = recorder({ [join(bunRootDir, "bin", "omo")]: bunBinShimScript(scriptPath, bunPath) })
+      const fs = recorder({ [join(bunRootDir, "bin", "str")]: bunBinShimScript(scriptPath, bunPath) })
       // when
       const result = ensureBunBinShim({ ...options, ...fs })
       // then
@@ -255,9 +255,9 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder({
-        [binPath]: `#!/bin/sh\n# omo-ai bun launcher shim v0 - older generator\nexec '${bunPath}' '${scriptPath}' "$@"\n`,
+        [binPath]: `#!/bin/sh\n# @deepnmr/str bun launcher shim v0 - older generator\nexec '${bunPath}' '${scriptPath}' "$@"\n`,
       })
       // when
       const result = ensureBunBinShim({ ...options, ...fs })
@@ -272,13 +272,13 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       // when
       const result = ensureBunBinShim({
         ...options,
-        realpath: (path: string) => (path === binPath ? "/usr/local/lib/node_modules/omo-ai/bin/omo.js" : path),
+        realpath: (path: string) => (path === binPath ? "/usr/local/lib/node_modules/@deepnmr/str/bin/omo.js" : path),
         ...fs,
       })
       // then
@@ -290,7 +290,7 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir } = baseInput(scriptPath)
-      const fs = recorder({ [join(bunRootDir, "bin", "omo")]: "#!/bin/sh\nexec something-else\n" })
+      const fs = recorder({ [join(bunRootDir, "bin", "str")]: "#!/bin/sh\nexec something-else\n" })
       // when
       const result = ensureBunBinShim({ ...options, ...fs })
       // then
@@ -328,7 +328,7 @@ describe("bun launcher bin shim", () => {
 
     test("#then an npm-layout install skips the check entirely", () => {
       // given
-      const { options } = baseInput("/usr/local/lib/node_modules/omo-ai/bin/omo.js")
+      const { options } = baseInput("/usr/local/lib/node_modules/@deepnmr/str/bin/omo.js")
       const fs = recorder()
       // when
       const result = ensureBunBinShim({ ...options, ...fs })
@@ -353,7 +353,7 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       const failing = {
@@ -374,7 +374,7 @@ describe("bun launcher bin shim", () => {
       // given
       const scriptPath = bunTreePackage(join(POSIX_HOME, ".bun"))
       const { options, bunRootDir } = baseInput(scriptPath, { env: { OMO_DEBUG: "1" } })
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       const warnings: string[] = []

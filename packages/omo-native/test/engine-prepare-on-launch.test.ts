@@ -7,7 +7,7 @@ import { ENGINE_PREPARED_STAMP, ensureEnginePrepared } from "../bin/lib/engine-p
 const PI_AI_MESSAGES = "node_modules/@earendil-works/pi-ai/dist/api/anthropic-messages.js"
 const RPC_MODE = "dist/modes/rpc/rpc-mode.js"
 const OMO_VERSION = "5.0.0-0.beta.86"
-const REINSTALL = "npm i -g omo-ai@beta"
+const REINSTALL = "npm i -g @deepnmr/str@beta"
 
 const roots: string[] = []
 

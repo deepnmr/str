@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
+import { PACKAGE_NAME } from "./brand.js"
 
 export const serialization = 'return JSON.stringify(value.type === "message_update" ? toJsonEvent(value) : value);'
 export const guardedSerialization = `try {
@@ -24,12 +25,12 @@ const requiredBindings = [
 /** Keep serializer failures on the RPC wire instead of escaping the event flush. */
 export function prepareRpcStreamErrors(senpiRoot) {
   const path = join(senpiRoot, "dist", "modes", "rpc", "rpc-mode.js")
-  if (!existsSync(path)) throw new Error("omo-ai: rpc_patch_target_missing: dist/modes/rpc/rpc-mode.js")
+  if (!existsSync(path)) throw new Error(`${PACKAGE_NAME}: rpc_patch_target_missing: dist/modes/rpc/rpc-mode.js`)
   const source = readFileSync(path, "utf8")
   for (const [name, declarations] of requiredBindings) {
-    if (!declarations.some((declaration) => declaration.test(source))) throw new Error(`omo-ai: rpc_patch_binding_missing: ${name}`)
+    if (!declarations.some((declaration) => declaration.test(source))) throw new Error(`${PACKAGE_NAME}: rpc_patch_binding_missing: ${name}`)
   }
   if (source.includes(guardedSerialization)) return
-  if (!source.includes(serialization)) throw new Error("omo-ai: unsupported Senpi RPC stream serializer")
+  if (!source.includes(serialization)) throw new Error(`${PACKAGE_NAME}: unsupported Senpi RPC stream serializer`)
   writeFileSync(path, source.replace(serialization, guardedSerialization))
 }

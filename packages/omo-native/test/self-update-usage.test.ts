@@ -23,7 +23,7 @@ async function selfUpdate(args: string[]): Promise<Harness> {
   const errors: string[] = []
   let lookups = 0
   const code = await runSelfUpdate(args, {
-    resolveUpdate: () => ({ manager: "npm", command: "npm i -g omo-ai@1.0.1", argv: ["npm", "i", "-g", "omo-ai@1.0.1"] }),
+    resolveUpdate: () => ({ manager: "npm", command: "npm i -g @deepnmr/str@1.0.1", argv: ["npm", "i", "-g", "@deepnmr/str@1.0.1"] }),
     fetchDistTags: () => {
       lookups += 1
       return { latest: "1.0.1" }
@@ -81,8 +81,8 @@ describe("omo update argument handling", () => {
       test(`#given ${args.join(" ")} #then it installs the resolved target once`, async () => {
         const result = await selfUpdate(args)
         expect(result.code).toBe(0)
-        expect(result.spawned).toEqual([["npm", ["i", "-g", "omo-ai@1.0.1"], expect.objectContaining({ stdio: "inherit" })]])
-        expect(result.lines).toEqual(["omo is updated via npm: npm i -g omo-ai@1.0.1", "omo 1.0.0 -> 1.0.1 (engine: senpi 2026.9.29)"])
+        expect(result.spawned).toEqual([["npm", ["i", "-g", "@deepnmr/str@1.0.1"], expect.objectContaining({ stdio: "inherit" })]])
+        expect(result.lines).toEqual(["str is updated via npm: npm i -g @deepnmr/str@1.0.1", "str 1.0.0 -> 1.0.1 (engine: senpi 2026.9.29)"])
       })
     }
 
@@ -91,7 +91,7 @@ describe("omo update argument handling", () => {
         const result = await selfUpdate(args)
         expect(result.code).toBe(0)
         expect(result.spawned).toEqual([])
-        expect(result.lines).toEqual(["omo is updated via npm: npm i -g omo-ai@1.0.1"])
+        expect(result.lines).toEqual(["str is updated via npm: npm i -g @deepnmr/str@1.0.1"])
       })
     }
   })
@@ -116,10 +116,10 @@ function writeFile(path: string, content: string): void {
 function launcherFixture(): { root: string; launcher: string; captureFile: string } {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "omo-update-usage-")))
   roots.push(root)
-  const packageRoot = join(root, "prefix", "lib", "node_modules", "omo-ai")
+  const packageRoot = join(root, "prefix", "lib", "node_modules", "@deepnmr", "str")
   cpSync(join(SOURCE_ROOT, "bin"), join(packageRoot, "bin"), { recursive: true })
   writeFile(join(packageRoot, "package.json"), JSON.stringify({
-    name: "omo-ai",
+    name: "@deepnmr/str",
     version: "1.2.3-test.0",
     type: "module",
     dependencies: { "@code-yeongyu/senpi": "2026.8.9" },
@@ -189,7 +189,7 @@ describe("omo launcher update routing", () => {
     expect(JSON.parse(readFileSync(fixture.captureFile, "utf8"))).toEqual({
       target: "install",
       command: "npm",
-      args: ["i", "-g", "omo-ai@1.2.3-test.1"],
+      args: ["i", "-g", "@deepnmr/str@1.2.3-test.1"],
     })
     // The fake manager leaves the version unchanged, so the post-install check reports it; the
     // install still ran, which is what this routing case is about.

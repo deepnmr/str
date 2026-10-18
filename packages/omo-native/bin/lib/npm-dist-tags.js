@@ -1,9 +1,9 @@
 import { spawnSync } from "node:child_process"
 
-const NPM_DIST_TAGS_URL = "https://registry.npmjs.org/-/package/omo-ai/dist-tags"
+const NPM_DIST_TAGS_URL = "https://registry.npmjs.org/-/package/@deepnmr%2Fstr/dist-tags"
 const NPM_FETCH_TIMEOUT_MS = 5000
 
-// The dist-tags of omo-ai, read by `omo doctor` for "Latest" and by `omo update` for the version it
+// The dist-tags of @deepnmr/str, read by `omo doctor` for "Latest" and by `omo update` for the version it
 // installs. Doctor is called without await from the launcher and the compiled entry, so the
 // registry lookup has to finish before we print. A bounded child fetch keeps that synchronous
 // and turns any network failure into null.

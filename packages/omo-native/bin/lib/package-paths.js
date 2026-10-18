@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { basename, dirname, join, parse } from "node:path"
 import { fileURLToPath } from "node:url"
+import { COMMAND, PACKAGE_NAME } from "./brand.js"
 
 export const packageRoot = fileURLToPath(new URL("../..", import.meta.url))
 
@@ -13,7 +14,7 @@ export function packageManifest() {
   return readJson(join(packageRoot, "package.json"))
 }
 
-const BUN_GLOBAL_PACKAGE_SUFFIX = "/install/global/node_modules/omo-ai"
+const BUN_GLOBAL_PACKAGE_SUFFIX = `/install/global/node_modules/${PACKAGE_NAME}`
 
 /** The npm dist-tag this build ships on: a prerelease version is on beta, a stable one on latest. */
 export function releaseChannel(version = packageManifest().version) {
@@ -29,12 +30,12 @@ export function channelDistTagVersion(distTags, version = packageManifest().vers
 
 /** The startup banner line: a prerelease names its beta channel, a stable release does not. */
 export function releaseBanner(version = packageManifest().version) {
-  return releaseChannel(version) === "beta" ? `omo (omo-ai beta ${version})` : `omo (omo-ai ${version})`
+  return releaseChannel(version) === "beta" ? `${COMMAND} (${PACKAGE_NAME} beta ${version})` : `${COMMAND} (${PACKAGE_NAME} ${version})`
 }
 
 /** The package spec that installs this build's channel: `omo-ai@beta` or the bare `omo-ai`. */
 export function channelPackageSpec(version = packageManifest().version) {
-  return releaseChannel(version) === "beta" ? "omo-ai@beta" : "omo-ai"
+  return releaseChannel(version) === "beta" ? `${PACKAGE_NAME}@beta` : PACKAGE_NAME
 }
 
 function installedVersion(root) {
@@ -65,14 +66,14 @@ export function updateTarget(
   targetVersion = undefined,
 ) {
   // A resolved target installs that exact version; without one the channel spec is the only answer.
-  const spec = targetVersion === undefined ? channelPackageSpec(version) : `omo-ai@${targetVersion}`
+  const spec = targetVersion === undefined ? channelPackageSpec(version) : `${PACKAGE_NAME}@${targetVersion}`
   const updateCwd = dirname(join(root, "package.json"))
   const normalizedRoot = updateCwd.replaceAll("\\", "/")
   const normalizedHome = homeDir.replaceAll("\\", "/").replace(/\/+$/, "")
   const bunInstall = normalizedRoot.endsWith(BUN_GLOBAL_PACKAGE_SUFFIX)
     ? normalizedRoot.slice(0, -BUN_GLOBAL_PACKAGE_SUFFIX.length)
     : undefined
-  const isLegacyBunGlobal = normalizedRoot === `${normalizedHome}/node_modules/omo-ai`
+  const isLegacyBunGlobal = normalizedRoot === `${normalizedHome}/node_modules/${PACKAGE_NAME}`
     && (exists(join(homeDir, "bun.lock")) || exists(join(homeDir, "bun.lockb")))
   if (bunInstall !== undefined || isLegacyBunGlobal) {
     // `--cwd` into this package dir does not retarget `bun add -g`; bun still installs into
@@ -126,7 +127,7 @@ export function resolveSenpi(options = {}) {
       ? " (close every running omo/senpi process first: Windows locks loaded native modules, so npm fails with EBUSY mid-upgrade and leaves exactly this partial state)"
       : ""
     throw new Error(
-      `senpi engine files are incomplete: ${brandPath} is missing, which usually means an interrupted or failed omo-ai upgrade; reinstall with: ${updateTarget().command}${windowsHint}`,
+      `senpi engine files are incomplete: ${brandPath} is missing, which usually means an interrupted or failed ${PACKAGE_NAME} upgrade; reinstall with: ${updateTarget().command}${windowsHint}`,
     )
   }
   return { cliPath, packageRoot: dirname(dirname(indexPath)) }

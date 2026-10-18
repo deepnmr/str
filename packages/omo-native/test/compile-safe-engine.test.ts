@@ -121,7 +121,7 @@ describe("compile-safe engine preparation", () => {
       test("#then preparation fails loud instead of shipping a broken binary", () => {
         const root = createEngine()
         write(join(root, "node_modules", "css-tree", "lib", "data.js"), "export default {};\n")
-        expect(() => prepareCompileSafeEngine(root)).toThrow("omo-ai: unsupported Senpi css-tree/lib/data.js")
+        expect(() => prepareCompileSafeEngine(root)).toThrow("@deepnmr/str: unsupported Senpi css-tree/lib/data.js")
       })
     })
   })

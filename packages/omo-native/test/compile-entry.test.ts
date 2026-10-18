@@ -414,22 +414,22 @@ describe("embedded runtime provisioning", () => {
     expect(output.join("\n")).toContain("INFO omo 9.2.1 (engine: senpi 2026.8.28; scheme nodef)")
   })
 
-  test("compiled doctor reports an npm omo-ai that the standalone binary shadows on PATH", async () => {
+  test("compiled doctor reports an npm @deepnmr/str that the standalone binary shadows on PATH", async () => {
     const root = temp()
     writeFileSync(join(root, "package.json"), JSON.stringify({ version: "9.2.1" }))
     const home = join(root, "home")
     const binary = Buffer.concat([Buffer.from("omo-binary"), Buffer.alloc(4096, 1)])
-    mkdirSync(join(home, ".omo", "binary-runtime", "9.2.1"), { recursive: true })
-    writeFileSync(join(home, ".omo", "binary-runtime", "9.2.1", "omo"), binary)
+    mkdirSync(join(home, ".str", "binary-runtime", "9.2.1"), { recursive: true })
+    writeFileSync(join(home, ".str", "binary-runtime", "9.2.1", "omo"), binary)
     mkdirSync(join(root, "local-bin"), { recursive: true })
-    writeFileSync(join(root, "local-bin", "omo"), binary)
+    writeFileSync(join(root, "local-bin", "str"), binary)
     const bunRoot = join(root, "bun")
-    const pkg = join(bunRoot, "install", "global", "node_modules", "omo-ai")
+    const pkg = join(bunRoot, "install", "global", "node_modules", "@deepnmr", "str")
     mkdirSync(join(pkg, "bin"), { recursive: true })
-    writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "omo-ai", version: "9.2.0" }))
+    writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "@deepnmr/str", version: "9.2.0" }))
     writeFileSync(join(pkg, "bin", "omo.js"), "#!/usr/bin/env node\n")
     mkdirSync(join(bunRoot, "bin"), { recursive: true })
-    symlinkSync(join(pkg, "bin", "omo.js"), join(bunRoot, "bin", "omo"))
+    symlinkSync(join(pkg, "bin", "omo.js"), join(bunRoot, "bin", "str"))
     const output: string[] = []
     const originalLog = console.log
     const originalExitCode = process.exitCode
@@ -446,7 +446,7 @@ describe("embedded runtime provisioning", () => {
     }
     const warning = output.join("\n").split("\n").find((line) => line.startsWith("WARN more than one OmO install is on PATH:"))
     expect(warning).toContain("(standalone omo binary 9.2.1) runs when you type omo")
-    expect(warning).toContain("omo-ai@9.2.0")
+    expect(warning).toContain("@deepnmr/str@9.2.0")
   })
 
   test("version uses the manifest engine pin without a provisioned senpi package", async () => {
@@ -675,19 +675,19 @@ describe("compiledBannerLines", () => {
 
   test("#given a release build with no build info #when the banner renders #then it keeps the release one-liner", () => {
     expect(compiledBannerLines({ omoAiVersion: "5.0.0-beta.40", buildInfo: undefined })).toEqual([
-      "omo (omo-ai beta 5.0.0-beta.40)",
+      "str (@deepnmr/str beta 5.0.0-beta.40)",
     ])
   })
 
   test("#given a stable release build #when the banner renders #then it does not call itself beta", () => {
-    expect(compiledBannerLines({ omoAiVersion: "5.0.0", buildInfo: undefined })).toEqual(["omo (omo-ai 5.0.0)"])
+    expect(compiledBannerLines({ omoAiVersion: "5.0.0", buildInfo: undefined })).toEqual(["str (@deepnmr/str 5.0.0)"])
   })
 
   test("#given malformed build info #when the banner renders #then it degrades to the release one-liner", () => {
     const malformed = { command: "omob", omo: { commit: "nope", committedAt: "", branch: "" }, engine: {} }
 
     expect(compiledBannerLines({ omoAiVersion: "5.0.0-beta.40", buildInfo: malformed })).toEqual([
-      "omo (omo-ai beta 5.0.0-beta.40)",
+      "str (@deepnmr/str beta 5.0.0-beta.40)",
     ])
   })
 

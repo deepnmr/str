@@ -1,4 +1,4 @@
-const selfUpdateTargets = new Set(["self", "senpi", "omo"])
+const selfUpdateTargets = new Set(["self", "senpi", "str"])
 // Updating extensions or model catalogs is the engine's job; everything else under `update`
 // would try to replace the pinned engine, so the launcher answers it instead.
 const engineUpdateTargets = new Set(["--extensions", "--models"])

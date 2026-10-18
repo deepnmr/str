@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { engineDependencyDir } from "./engine-dependency.js"
+import { PACKAGE_NAME } from "./brand.js"
 
 const piAiPackage = "@earendil-works/pi-ai"
 const claudeCodeVersionRelative = "dist/api/anthropic-messages.js"
@@ -18,10 +19,10 @@ function isBelowFloor([major, minor, patch]) {
 function floorPiAi(senpiRoot) {
   const piAiRoot = engineDependencyDir(senpiRoot, piAiPackage)
   const path = piAiRoot === undefined ? undefined : join(piAiRoot, claudeCodeVersionRelative)
-  if (path === undefined || !existsSync(path)) throw new Error(`omo-ai: installed Senpi target is missing: ${claudeCodeVersionTarget}`)
+  if (path === undefined || !existsSync(path)) throw new Error(`${PACKAGE_NAME}: installed Senpi target is missing: ${claudeCodeVersionTarget}`)
   const source = readFileSync(path, "utf8")
   const match = claudeCodeVersionPattern.exec(source)
-  if (match === null) throw new Error(`omo-ai: unsupported Senpi ${claudeCodeVersionTarget}`)
+  if (match === null) throw new Error(`${PACKAGE_NAME}: unsupported Senpi ${claudeCodeVersionTarget}`)
   if (!isBelowFloor(match.slice(1).map(Number))) return
   writeFileSync(path, source.replace(claudeCodeVersionPattern, `const claudeCodeVersion = "${claudeCodeVersionFloor}";`))
 }
@@ -48,7 +49,7 @@ function floorEngineBundle(senpiRoot) {
     })
     if (raised) writeFileSync(path, next)
   }
-  if (declarations === 0) throw new Error(`omo-ai: unsupported Senpi ${bundleRelative}: no claudeCodeVersion declaration`)
+  if (declarations === 0) throw new Error(`${PACKAGE_NAME}: unsupported Senpi ${bundleRelative}: no claudeCodeVersion declaration`)
 }
 
 export function floorClaudeCodeVersion(senpiRoot) {

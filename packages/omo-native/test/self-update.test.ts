@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { channelPackageSpec, releaseChannel, updateTarget } from "../bin/lib/package-paths.js"
 
 // updateTarget reads the version of the install it is pointed at and falls back to this package's own
-// manifest, so the expected spelling follows the package channel (`omo-ai` stable, `omo-ai@beta` prerelease).
+// manifest, so the expected spelling follows the package channel (`omo-ai` stable, `@deepnmr/str@beta` prerelease).
 const SPEC = channelPackageSpec()
 import {
   formatUpdateCommand,
@@ -15,7 +15,7 @@ import {
 // channel spec; the pinned path lives in self-update-pinned-target.test.ts.
 const offline = { fetchDistTags: () => null }
 function unconfirmedNotice(version: string): string {
-  return `omo: could not confirm the ${releaseChannel(version)} omo-ai version from the npm registry; installing the unpinned ${channelPackageSpec(version)}`
+  return `str: could not confirm the ${releaseChannel(version)} @deepnmr/str version from the npm registry; installing the unpinned ${channelPackageSpec(version)}`
 }
 
 function bunRoot(path: string): string {
@@ -25,7 +25,7 @@ function bunRoot(path: string): string {
 describe("updateTarget", () => {
   describe("#given a Bun global install layout", () => {
     test("#then the command is bun add -g and BUN_INSTALL is the prefix, not a --cwd into the package", () => {
-      const root = bunRoot("/tmp/custom-bun/install/global/node_modules/omo-ai")
+      const root = bunRoot("/tmp/custom-bun/install/global/node_modules/@deepnmr/str")
       expect(updateTarget(root)).toEqual({
         manager: "bun",
         command: `bun add -g ${SPEC}`,
@@ -35,7 +35,7 @@ describe("updateTarget", () => {
     })
 
     test("#then a Windows-style Bun path still yields bun add -g with BUN_INSTALL at the bun root", () => {
-      const root = String.raw`C:\Users\omo user\.bun\install\global\node_modules\omo-ai`
+      const root = String.raw`C:\Users\omo user\.bun\install\global\node_modules\@deepnmr\str`
       expect(updateTarget(root, "win32")).toEqual({
         manager: "bun",
         command: `bun add -g ${SPEC}`,
@@ -45,7 +45,7 @@ describe("updateTarget", () => {
     })
 
     test("#then a path with shell metacharacters is carried in BUN_INSTALL, not quoted into the command", () => {
-      const root = "/tmp/custom $HOME's bun/install/global/node_modules/omo-ai"
+      const root = "/tmp/custom $HOME's bun/install/global/node_modules/@deepnmr/str"
       const target = updateTarget(root)
       expect(target.command).toBe(`bun add -g ${SPEC}`)
       expect(target.env).toEqual({ BUN_INSTALL: "/tmp/custom $HOME's bun" })
@@ -54,7 +54,7 @@ describe("updateTarget", () => {
 
   describe("#given an npm or unknown layout", () => {
     test("#then the command stays npm i -g with npm argv and no BUN_INSTALL overlay", () => {
-      expect(updateTarget("/tmp/prefix/lib/node_modules/omo-ai")).toEqual({
+      expect(updateTarget("/tmp/prefix/lib/node_modules/@deepnmr/str")).toEqual({
         manager: "npm",
         command: `npm i -g ${SPEC}`,
         argv: ["npm", "i", "-g", SPEC],
@@ -131,13 +131,13 @@ describe("omo self-update", () => {
         }])
         expect(lines).toEqual([
           unconfirmedNotice("5.0.0-0.beta.88"),
-          `omo is updated via bun: bun add -g ${SPEC}`,
-          "omo 5.0.0-0.beta.88 -> 5.0.0-0.beta.89 (engine: senpi 2026.9.24)",
+          `str is updated via bun: bun add -g ${SPEC}`,
+          "str 5.0.0-0.beta.88 -> 5.0.0-0.beta.89 (engine: senpi 2026.9.24)",
         ])
         expect(formatVersionChange(
           { omo: "5.0.0-0.beta.88", engine: "2026.9.1" },
           { omo: "5.0.0-0.beta.89", engine: "2026.9.24" },
-        )).toBe("omo 5.0.0-0.beta.88 -> 5.0.0-0.beta.89 (engine: senpi 2026.9.24)")
+        )).toBe("str 5.0.0-0.beta.88 -> 5.0.0-0.beta.89 (engine: senpi 2026.9.24)")
       })
 
       test("#then an npm-managed install spawns npm i -g without a BUN_INSTALL overlay", async () => {
@@ -175,8 +175,8 @@ describe("omo self-update", () => {
           error: (line) => errors.push(line),
         })
         expect(code).toBe(7)
-        expect(lines).toEqual([unconfirmedNotice("5.0.0-0.beta.88"), `omo is updated via bun: bun add -g ${SPEC}`])
-        expect(errors).toEqual([`omo: update failed; retry with: bun add -g ${SPEC}`])
+        expect(lines).toEqual([unconfirmedNotice("5.0.0-0.beta.88"), `str is updated via bun: bun add -g ${SPEC}`])
+        expect(errors).toEqual([`str: update failed; retry with: bun add -g ${SPEC}`])
       })
 
       test("#then a spawn error exits 1 with the same retry command", async () => {
@@ -192,7 +192,7 @@ describe("omo self-update", () => {
           error: (line) => errors.push(line),
         })
         expect(code).toBe(1)
-        expect(errors).toEqual([`omo: update failed; retry with: npm i -g ${SPEC}`])
+        expect(errors).toEqual([`str: update failed; retry with: npm i -g ${SPEC}`])
       })
     })
   })

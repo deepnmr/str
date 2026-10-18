@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import { dirname, join } from "node:path"
+import { PACKAGE_NAME } from "./brand.js"
 
 /**
  * Inlines the css-tree data that a compiled binary cannot resolve.
@@ -62,7 +63,7 @@ function inlineOnce(path, pattern, replacement, inlinedMarker, relativeName) {
     writeFileSync(path, inlined)
     return
   }
-  if (!source.includes(inlinedMarker)) throw new Error(`omo-ai: unsupported Senpi ${relativeName}`)
+  if (!source.includes(inlinedMarker)) throw new Error(`${PACKAGE_NAME}: unsupported Senpi ${relativeName}`)
 }
 
 function inlineDataPatch(cssTreeRoot) {

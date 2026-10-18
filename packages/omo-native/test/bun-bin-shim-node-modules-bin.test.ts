@@ -34,7 +34,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
     test("#then each one is replaced by the same shim through its own atomic rename", () => {
       // given
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const nodeModulesBin = nodeModulesBinPath(bunRootDir)
       const fs = recorder()
       fs.markLink(binPath)
@@ -69,7 +69,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
     test("#then a link into another install is left alone while the bun bin is still repaired", () => {
       // given
       const { options, bunRootDir } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const nodeModulesBin = nodeModulesBinPath(bunRootDir)
       const fs = recorder()
       fs.markLink(binPath)
@@ -79,7 +79,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
         ...options,
         realpath: (path: string) =>
           path === binPath ? scriptPath
-          : path === nodeModulesBin ? "/usr/local/lib/node_modules/omo-ai/bin/omo.js"
+          : path === nodeModulesBin ? "/usr/local/lib/node_modules/@deepnmr/str/bin/omo.js"
           : path,
         ...fs,
       })
@@ -106,7 +106,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
     test("#then the missing node_modules/.bin entry is reported and the bun bin is still repaired", () => {
       // given - an npm-shaped tree, or a bun root whose global node_modules was never populated
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const fs = recorder()
       fs.markLink(binPath)
       // when
@@ -131,7 +131,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
     test("#then it is not rewritten while the stale bun bin is", () => {
       // given
       const { options, bunRootDir, bunPath } = baseInput(scriptPath)
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const nodeModulesBin = nodeModulesBinPath(bunRootDir)
       const fs = recorder({ [nodeModulesBin]: bunBinShimScript(scriptPath, bunPath) })
       fs.markLink(binPath)
@@ -152,7 +152,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
     test("#then the other entry is still repaired and OMO_DEBUG narrates only the failure", () => {
       // given
       const { options, bunRootDir, bunPath } = baseInput(scriptPath, { env: { OMO_DEBUG: "1" } })
-      const binPath = join(bunRootDir, "bin", "omo")
+      const binPath = join(bunRootDir, "bin", "str")
       const nodeModulesBin = nodeModulesBinPath(bunRootDir)
       const fs = recorder()
       fs.markLink(binPath)
@@ -185,7 +185,7 @@ describe.skipIf(NON_POSIX_HOST)("bun global node_modules/.bin shim", () => {
   describe("#given the launch context rules the repair out", () => {
     test("#then a skipped launch reports no entries at all", () => {
       // given
-      const { options } = baseInput("/usr/local/lib/node_modules/omo-ai/bin/omo.js")
+      const { options } = baseInput("/usr/local/lib/node_modules/@deepnmr/str/bin/omo.js")
       const fs = recorder()
       // when
       const result = ensureBunBinShim({ ...options, ...fs })
