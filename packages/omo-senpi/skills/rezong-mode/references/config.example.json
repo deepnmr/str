@@ -1,5 +1,5 @@
 {
-  "stateDir": "~/.dori/state",
+  "stateDir": "~/.rezong/state",
   "laneWorkspace": "lanes",
   "workspaces": [
     "lanes"

@@ -32,7 +32,7 @@ export const freshnessTick = async (deps: FlowDeps, home: string): Promise<Sweep
       if (checked && checked.lane.lastFreshnessNote !== "working-while-paused") {
         // Reported once per working stretch (the note clears when the lane goes idle), so the lead can ask; it stays paused.
         await deps.registry.write({ ...checked.lane, lastFreshnessNote: "working-while-paused" });
-        acts.push({ kind: "working-while-paused", lane: lane.key, detail: "paused lane is working on two ticks; left paused (resume is dori resume only)" });
+        acts.push({ kind: "working-while-paused", lane: lane.key, detail: "paused lane is working on two ticks; left paused (resume is rezong resume only)" });
       }
       continue;
     }

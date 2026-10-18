@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { type DoriConfig, defaultConfig } from "../src/config.ts";
+import { type RezongConfig, defaultConfig } from "../src/config.ts";
 import type { FlowDeps } from "../src/done-flow.ts";
 import { Registry } from "../src/registry.ts";
 import type { Clock, Ran, Runner } from "../src/run.ts";
@@ -60,12 +60,12 @@ export const fakeClock = (start: number): Clock & { at: number } => {
 };
 
 export const withState = (): { dir: string; done: () => void } => {
-  const dir = mkdtempSync(join(tmpdir(), "dori-test-"));
+  const dir = mkdtempSync(join(tmpdir(), "rezong-test-"));
   return { dir, done: () => rmSync(dir, { recursive: true, force: true }) };
 };
 
-export const depsFor = (w: World, clock: Clock, stateDir: string, patch: Partial<DoriConfig> = {}): FlowDeps => {
-  const config: DoriConfig = { ...defaultConfig("/home/test"), stateDir, defaultCwd: "/repo", leadPane: "lead:p1", ...patch };
+export const depsFor = (w: World, clock: Clock, stateDir: string, patch: Partial<RezongConfig> = {}): FlowDeps => {
+  const config: RezongConfig = { ...defaultConfig("/home/test"), stateDir, defaultCwd: "/repo", leadPane: "lead:p1", ...patch };
   return { run: fakeRunner(w), clock, registry: new Registry(stateDir), config, exists: () => true };
 };
 

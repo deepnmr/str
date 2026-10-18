@@ -4,7 +4,7 @@ Run these once, in order. Stop and ask the owner wherever a step needs their cho
 
 ## 1. herdr
 
-herdr is the terminal multiplexer the Dori runs in. Every lane is a herdr tab, and herdr lets you read a pane, type into it and see which process runs there.
+herdr is the terminal multiplexer the Rezong runs in. Every lane is a herdr tab, and herdr lets you read a pane, type into it and see which process runs there.
 
 ```sh
 curl -fsSL https://herdr.dev/install.sh | sh
@@ -25,20 +25,20 @@ agent-messenger wraps part of each platform. Read the platform's current bot API
 
 Ask which mode, give the trade-off as a short list, and wait for the choice:
 
-- **User token**: the Dori acts as a real member of the workspace.
+- **User token**: the Rezong acts as a real member of the workspace.
   - It needs a paid seat, which the owner pays for.
   - It reads everything that member can see.
-  - It can keep a green online dot (`dori presence slack`).
-- **Bot token**: the Dori is a Slack app.
+  - It can keep a green online dot (`rezong presence slack`).
+- **Bot token**: the Rezong is a Slack app.
   - There's no seat cost.
   - It only sees channels it is invited to, within the scopes the app was granted.
   - It shows as an app, not a person.
 
-Record the choice. With a user token, set `DORI_SLACK_TOKEN` and `DORI_SLACK_COOKIE` (the `d` cookie from that member's browser session). With a bot token, set `DORI_SLACK_TOKEN` to the `xoxb-` token.
+Record the choice. With a user token, set `REZONG_SLACK_TOKEN` and `REZONG_SLACK_COOKIE` (the `d` cookie from that member's browser session). With a bot token, set `REZONG_SLACK_TOKEN` to the `xoxb-` token.
 
 ## 3. Bot
 
-Finish every login in the browser. Create the bot with agent-messenger and finish its setup. Then give it its avatar: the default is `assets/dori-avatar.png` in this skill, and the owner can swap in any image.
+Finish every login in the browser. Create the bot with agent-messenger and finish its setup. Then give it its avatar: the default is `assets/rezong-avatar.png` in this skill, and the owner can swap in any image.
 
 - **Telegram**: @BotFather → `/setuserpic` → pick the bot → send the image.
 - **Discord**: Developer Portal → your application → **General Information** → App Icon, and **Bot** → Icon.
@@ -51,11 +51,11 @@ Greet the owner through the bot before doing anything else.
 ## 4. Scripts
 
 ```sh
-cd skills/dori-mode/scripts && bun install && bun link    # puts `dori` on PATH
-mkdir -p ~/.dori && cp ../references/config.example.json ~/.dori/config.json
+cd skills/rezong-mode/scripts && bun install && bun link    # puts `rezong` on PATH
+mkdir -p ~/.rezong && cp ../references/config.example.json ~/.rezong/config.json
 ```
 
-Then edit `~/.dori/config.json`: at least `leadPane` (your own herdr pane, from `herdr pane current`), `laneWorkspace`, `defaultCwd`, and the two hooks if you want lane threads updated automatically. `references/scripts.md` explains every field.
+Then edit `~/.rezong/config.json`: at least `leadPane` (your own herdr pane, from `herdr pane current`), `laneWorkspace`, `defaultCwd`, and the two hooks if you want lane threads updated automatically. `references/scripts.md` explains every field.
 
 ## 5. Monitors
 
@@ -64,13 +64,13 @@ Arm these as persistent monitors in your own session:
 | Monitor | Command | Filter |
 |---|---|---|
 | inbound messages | your messenger's watch command | new owner messages |
-| done flow | `dori watch` | `^LANE_` |
-| dead panes | `dori dead-panes --loop 3` | `^(DEAD_PANE\|UNRECOGNISED_PANE)` |
-| host guard | `dori guard --loop 1` | `^HOST_GUARD` |
-| freshness | `dori freshness --loop 5` | `^(NUDGED\|POSTED\|NO-REPORT\|PENDING-REPORT\|STALE-REPORT)` |
-| Slack inbound (Slack only) | `dori inbound slack --loop 1` | `^INBOUND` |
-| presence (optional) | `dori presence slack` or `dori presence discord` | `^PRESENCE_READY` |
+| done flow | `rezong watch` | `^LANE_` |
+| dead panes | `rezong dead-panes --loop 3` | `^(DEAD_PANE\|UNRECOGNISED_PANE)` |
+| host guard | `rezong guard --loop 1` | `^HOST_GUARD` |
+| freshness | `rezong freshness --loop 5` | `^(NUDGED\|POSTED\|NO-REPORT\|PENDING-REPORT\|STALE-REPORT)` |
+| Slack inbound (Slack only) | `rezong inbound slack --loop 1` | `^INBOUND` |
+| presence (optional) | `rezong presence slack` or `rezong presence discord` | `^PRESENCE_READY` |
 
 ## 6. First look around
 
-Once the bot is live, explore the machine: running coding-agent sessions, the tools in use, recent logs. Write what you find into memory, and adopt any running lanes with `dori adopt`.
+Once the bot is live, explore the machine: running coding-agent sessions, the tools in use, recent logs. Write what you find into memory, and adopt any running lanes with `rezong adopt`.

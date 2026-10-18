@@ -64,7 +64,7 @@ export const resumeLane = async (deps: FlowDeps, lane: Lane, note: string): Prom
 export type PausedCheck = { readonly lane: Lane; readonly outcome: "working-while-paused" } | null;
 
 /**
- * Resume is explicit only: `dori resume`, on the owner's word. Activity never ends a pause, because a paused
+ * Resume is explicit only: `rezong resume`, on the owner's word. Activity never ends a pause, because a paused
  * lane can still be woken (a background result, a queued message, a turn after Escape) and its owner said
  * wait. A paused lane whose pane reads working on two ticks in a row is reported so the lead can ask; it
  * stays paused.

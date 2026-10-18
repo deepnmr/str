@@ -5,7 +5,7 @@ import { pauseLane, resumeLane } from "../src/pause.ts";
 import { type Lane, statusOf } from "../src/registry.ts";
 import { depsFor, fakeClock, newWorld, sent, withState, type World } from "./fakes.ts";
 
-// Issue #11: telling Dori to wait must stick. One paused state silences the freshness sweep and pauses the goal,
+// Issue #11: telling Rezong to wait must stick. One paused state silences the freshness sweep and pauses the goal,
 // and the lane is marked paused only once the pane shows the goal paused.
 const T0 = Date.parse("2026-01-01T12:00:00.000Z");
 const MIN = 60_000;
@@ -107,7 +107,7 @@ test("resume of a working lane restarts the quiet clock: no nudge until nudgeAft
   expect((await freshnessTick(deps(T0 + 106 * MIN), "/home/test")).map((a) => a.kind)).toEqual(["nudged"]);
 });
 
-test("a lane paused mid-turn (Escape) and then woken stays paused: resume is dori resume only, whatever the screen shows", async () => {
+test("a lane paused mid-turn (Escape) and then woken stays paused: resume is rezong resume only, whatever the screen shows", async () => {
   paneStatus("working");
   await deps(T0).registry.write(working);
   paneSays("❯ ", "Goal paused\n❯ ");

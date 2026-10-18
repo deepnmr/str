@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -17,7 +18,7 @@ export type GuardThresholds = {
   readonly panesMax: number;
 };
 
-export type DoriConfig = {
+export type RezongConfig = {
   readonly stateDir: string;
   readonly laneWorkspace: string;
   readonly workspaces: readonly string[];
@@ -38,8 +39,17 @@ export type DoriConfig = {
   readonly hooks: Hooks;
 };
 
-export const defaultConfig = (home = homedir()): DoriConfig => ({
-  stateDir: join(home, ".dori", "state"),
+/** REZONG_<name>, falling back to the legacy DORI_<name>. */
+export const env = (name: string): string | undefined => process.env[`REZONG_${name}`] ?? process.env[`DORI_${name}`];
+
+/** ~/.rezong, unless only the legacy ~/.dori/config.json exists. */
+export const rezongHome = (home = homedir()): string => {
+  const legacy = join(home, ".dori");
+  return !existsSync(join(home, ".rezong", "config.json")) && existsSync(join(legacy, "config.json")) ? ".dori" : ".rezong";
+};
+
+export const defaultConfig = (home = homedir()): RezongConfig => ({
+  stateDir: join(home, rezongHome(home), "state"),
   laneWorkspace: "",
   workspaces: [],
   ignorePanes: [],
@@ -59,21 +69,21 @@ export const defaultConfig = (home = homedir()): DoriConfig => ({
   hooks: {},
 });
 
-export const configPath = (): string => process.env.DORI_CONFIG ?? join(homedir(), ".dori", "config.json");
+export const configPath = (): string => env("CONFIG") ?? join(homedir(), rezongHome(), "config.json");
 
 export const expandHome = (path: string, home = homedir()): string => (path === "~" ? home : path.startsWith("~/") ? join(home, path.slice(2)) : path);
 
-export const loadConfig = async (path = configPath(), home = homedir()): Promise<DoriConfig> => {
+export const loadConfig = async (path = configPath(), home = homedir()): Promise<RezongConfig> => {
   const base = defaultConfig(home);
   const file = Bun.file(path);
-  const raw = (await file.exists()) ? ((await file.json()) as Partial<DoriConfig>) : {};
-  const merged: DoriConfig = { ...base, ...raw, guard: { ...base.guard, ...raw.guard }, hooks: { ...base.hooks, ...raw.hooks } };
+  const raw = (await file.exists()) ? ((await file.json()) as Partial<RezongConfig>) : {};
+  const merged: RezongConfig = { ...base, ...raw, guard: { ...base.guard, ...raw.guard }, hooks: { ...base.hooks, ...raw.hooks } };
   return {
     ...merged,
-    stateDir: expandHome(process.env.DORI_STATE_DIR ?? merged.stateDir, home),
+    stateDir: expandHome(env("STATE_DIR") ?? merged.stateDir, home),
     defaultCwd: expandHome(merged.defaultCwd, home),
     sessionsDir: expandHome(merged.sessionsDir, home),
-    leadPane: process.env.DORI_LEAD_PANE ?? merged.leadPane,
+    leadPane: env("LEAD_PANE") ?? merged.leadPane,
   };
 };
 

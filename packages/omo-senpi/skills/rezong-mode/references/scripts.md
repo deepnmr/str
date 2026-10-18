@@ -1,13 +1,13 @@
 # Scripts
 
-`scripts/` is a bun + TypeScript package with one CLI, `dori`. Every external command runs as an argv array; nothing builds a shell string.
+`scripts/` is a bun + TypeScript package with one CLI, `rezong`. Every external command runs as an argv array; nothing builds a shell string.
 
 ## Install and test
 
 ```sh
-cd skills/dori-mode/scripts
+cd skills/rezong-mode/scripts
 bun install          # dev dependencies only (types, tsc)
-bun link             # puts `dori` on your PATH
+bun link             # puts `rezong` on your PATH
 bun test             # behavior tests with fake herdr/git/gh; nothing real is touched
 bunx tsc --noEmit    # typecheck
 ```
@@ -16,11 +16,11 @@ Needs: bun 1.3+, herdr, git, and the GitHub CLI (`gh`) for `merged`/`closed` sig
 
 ## Configuration
 
-`~/.dori/config.json` (or the path in `DORI_CONFIG`). Every field is optional; see `config.example.json`. `DORI_STATE_DIR` and `DORI_LEAD_PANE` override the file.
+`~/.rezong/config.json` (or the path in `REZONG_CONFIG`). Every field is optional; see `config.example.json`. `REZONG_STATE_DIR` and `REZONG_LEAD_PANE` override the file.
 
 | Field | Default | Used by |
 |---|---|---|
-| `stateDir` | `~/.dori/state` | registry, heavy slots |
+| `stateDir` | `~/.rezong/state` | registry, heavy slots |
 | `laneWorkspace` | current workspace | `launch` |
 | `workspaces` | all | `sync`, `dead-panes` |
 | `ignorePanes`, `leadPane` | none | panes the sweeps skip; `leadPane` is also where lanes report |
@@ -48,7 +48,7 @@ The CLI is a thin layer over typed modules you can import in your own scripts:
 | `src/messenger/discord.ts` | `Discord`: send without pings, edit, typing, threads (start, rename, archive); gateway presence |
 | `src/messenger/typing.ts` | `typingWhile`: show typing while a piece of work runs, stop when it ends |
 | `src/messenger/voice.ts` | `transcribe`: voice note to text through your hook |
-| `src/messenger/thread-ledger.ts` | `ThreadLedger`: every thread the Dori posts in, persisted; given to `Slack`, it records each `chat.postMessage` (also raw `call`s) |
+| `src/messenger/thread-ledger.ts` | `ThreadLedger`: every thread the Rezong posts in, persisted; given to `Slack`, it records each `chat.postMessage` (also raw `call`s) |
 | `src/messenger/slack-inbound.ts` | `pollSlackInbound`: threads view, the ledger's threads and unread counts, deduplicated, own messages filtered |
 | `src/messenger/slack-presence.ts` | `slackPresence`: hold a user account active |
 | `src/routing.ts` | `canLaunch`, `idleLaneFor`: the routing checks |
@@ -57,64 +57,64 @@ Every module takes its HTTP, clock and timers as arguments. That is how the test
 
 ## Commands
 
-### `dori launch <key> --title T --brief FILE --done "..." [--thread REF] [--model M] [--cwd DIR]`
+### `rezong launch <key> --title T --brief FILE --done "..." [--thread REF] [--model M] [--cwd DIR]`
 Opens a lane: appends the footer to the brief, opens a tab, starts the agent, and after 20 seconds checks it: `STARTUP_ERROR` on a known failure in the pane, `STARTUP_OK` only when herdr reports the agent idle or working, and `STARTUP_UNCONFIRMED` (with the last lines) otherwise. Exit 3 on anything but `STARTUP_OK`.
 
-### `dori adopt <key> --pane ID --title T --brief FILE --done "..." [--thread REF]`
+### `rezong adopt <key> --pane ID --title T --brief FILE --done "..." [--thread REF]`
 Registers a lane that is already running.
 
-### `dori sync [--write]`
+### `rezong sync [--write]`
 Prints `key | thread | pane | session | status` for every open lane and every unregistered agent pane, followed by drift. Read-only unless `--write`, which stores session ids.
 
-### `dori claim-done [<key>] --evidence TEXT` / `dori object-done <key> --reason TEXT ...`
+### `rezong claim-done [<key>] --evidence TEXT` / `rezong object-done <key> --reason TEXT ...`
 The two halves of the done flow. Both message the lane's pane and check that Enter registered.
 
-### `dori close <key> [--note TEXT]`
+### `rezong close <key> [--note TEXT]`
 Closes a lane now. Refuses (exit 2) unless every `Done =` signal reads back live. On success it marks the thread done through `hooks.threadDone`, closes the tab, and removes the lane's worktrees with a plain `git worktree remove`, which refuses a dirty worktree.
 
-### `dori pause <key> [--note TEXT]` / `dori resume <key> [--note TEXT]`
+### `rezong pause <key> [--note TEXT]` / `rezong resume <key> [--note TEXT]`
 `pause` is for when the owner said wait. It works on a `working` or `not-done` lane. It sends `/goal pause` to the lane's pane, then reads the screen back until the goal command's own line appears on a line of its own: `Goal paused`, or `cannot update goal: no goal exists`, since a lane with no goal has nothing to continue. Only then does it mark the lane `paused` (recorded in its history) and send Escape if a turn is running. The goal is paused first, so stopping the turn cannot hand off to a goal continuation. If the line does not appear, or the send fails, the lane is left as it was and the command prints `PAUSE_UNVERIFIED` and exits 3.
 
-A paused lane is skipped by `freshness`: no nudge, no post. Only `dori resume` ends a pause, on the owner's word. Activity never does, because a paused lane can still be woken by a background result, a queued message or a turn after Escape. If its pane reads `working` on two ticks in a row, `freshness` prints `WORKING-WHILE-PAUSED` once per working stretch (again after it goes idle and is woken, or after a new pause), so the lead can ask the owner, and the lane stays paused.
+A paused lane is skipped by `freshness`: no nudge, no post. Only `rezong resume` ends a pause, on the owner's word. Activity never does, because a paused lane can still be woken by a background result, a queued message or a turn after Escape. If its pane reads `working` on two ticks in a row, `freshness` prints `WORKING-WHILE-PAUSED` once per working stretch (again after it goes idle and is woken, or after a new pause), so the lead can ask the owner, and the lane stays paused.
 
 `resume` sends `/goal resume` and reads back `Goal active` the same way, then restores the status the lane had before the pause (`pausedFrom`) and restarts its quiet time, so a long pause does not turn into an instant nudge. Unconfirmed: `RESUME_UNVERIFIED`, exit 3.
 
 Both print `PAUSED` / `RESUMED` and exit 0 on success. A lane in any other state is refused (`NOT_PAUSED` / `NOT_RESUMED`, exit 2), and a second `pause` is a no-op. `claim-done` and `object-done` on a paused lane move it out of `paused` in the registry while its goal stays paused.
 
-### `dori watch`
+### `rezong watch`
 Runs forever. Every 30 seconds it prints each new claim once (`LANE_DONE_CLAIMED`). Claims older than `closeAfterMin` are settled: unpushed or uncommitted work and failing signals turn into objections (`LANE_NOT_DONE`); otherwise the lane is closed (`LANE_CLOSED`). The deadline lives in the registry, so a restart picks up where it left off.
 
-### `dori freshness [--loop MIN]`
+### `rezong freshness [--loop MIN]`
 For working lanes that have gone quiet: a nudge in the pane after `nudgeAfterMin`, then the lane's last `[REPORT]` line posted to its thread after `postAfterMin`, with home paths and pane ids scrubbed. Each happens once per silence. The line is posted only once it is still the last `[REPORT]` line on the next tick (`PENDING-REPORT` the first time) and differs from the line posted last time (`STALE-REPORT` otherwise). A held-back outcome is printed once per change, not on every tick. A nudge reports its delivery as `delivered` (the agent status moved to working) or `unconfirmed`.
 
-### `dori dead-panes [--loop MIN]`
+### `rezong dead-panes [--loop MIN]`
 Prints `DEAD_PANE <id>` once per hour for a pane with no running agent status whose last lines match `deadPanePatterns` on two ticks in a row with the same text. A pane herdr reports as idle, working, blocked or done is never dead. A pane that is neither is unrecognised; three unrecognised ticks in a row print `UNRECOGNISED_PANE <id> ...` once (list non-agent panes in `ignorePanes`).
 
-### `dori guard [--loop MIN]`
+### `rezong guard [--loop MIN]`
 Prints `HOST_GUARD ALERT <reasons>` when load, free memory, free disk or the pane count crosses its threshold, and `HOST_GUARD CLEAR` when it recovers. It also prints `COMPUTE_READY` / `COMPUTE_BUSY` as load crosses `loadOk`. Only changes are printed.
 
-### `dori can-launch`
+### `rezong can-launch`
 Prints `CAN_LAUNCH` and exits 0 when the host has room for another lane. Otherwise it prints `HOLD <reasons>` and exits 4. The reasons come from the guard's memory, disk and pane-count thresholds. CPU load alone never holds a launch, because it moves too fast to plan around.
 
-### `dori send <slack|telegram|discord> --to TARGET --text TEXT [--thread ID] [--edit ID]`
-Posts a message, or edits one with `--edit`. Tokens come from `DORI_SLACK_TOKEN` (plus `DORI_SLACK_COOKIE` for a user token), `DORI_TELEGRAM_TOKEN` or `DORI_DISCORD_TOKEN`. Text containing `$(` is refused, since it can only come from a shell string. Rate limits are retried with the server's wait time; other errors fail at once.
+### `rezong send <slack|telegram|discord> --to TARGET --text TEXT [--thread ID] [--edit ID]`
+Posts a message, or edits one with `--edit`. Tokens come from `REZONG_SLACK_TOKEN` (plus `REZONG_SLACK_COOKIE` for a user token), `REZONG_TELEGRAM_TOKEN` or `REZONG_DISCORD_TOKEN`. Text containing `$(` is refused, since it can only come from a shell string. Rate limits are retried with the server's wait time; other errors fail at once.
 
-### `dori presence <slack|discord>`
+### `rezong presence <slack|discord>`
 Keeps the account shown as online until stopped.
 - **Discord:** the bot connects to the gateway and identifies as online.
 - **Slack, user token:** it opens one web-client-type socket and tickles it every minute. Slack shows a user active only while such a socket is open, and auto-aways an idle one after about 30 minutes.
 - Run one instance per account. Two writers flip each other's presence.
 
-### `dori inbound slack [--loop MIN]`
+### `rezong inbound slack [--loop MIN]`
 Prints `INBOUND <source> <channel> <thread> <ts> <user> <text>`. It reads from three places, each message once:
 - `threads-view`: unread replies in threads the account follows (Slack's own Threads view);
-- `own-thread`: new replies in any thread the Dori posted in, tagged or not;
+- `own-thread`: new replies in any thread the Rezong posted in, tagged or not;
 - `unread`: DMs, group DMs and channels with unread mentions.
 
-The Dori's own messages and bot messages are skipped. Every message the Dori posts records its thread in `<stateDir>/slack-threads.json`, whichever helper sends it, so a guest's untagged reply under a root posted with a raw API call is still found.
+The Rezong's own messages and bot messages are skipped. Every message the Rezong posts records its thread in `<stateDir>/slack-threads.json`, whichever helper sends it, so a guest's untagged reply under a root posted with a raw API call is still found.
 
-### `dori transcribe <audio-file>`
+### `rezong transcribe <audio-file>`
 Runs `hooks.transcribe` and prints the transcript. A failed or empty transcription is an error, never an empty message.
 
-### `dori heavy <label> -- <command ...>`
+### `rezong heavy <label> -- <command ...>`
 Waits until load is under `heavyMaxLoad` and one of `heavySlots` is free, then runs the command and frees the slot when it exits. A slot held by a process that no longer exists (or a zombie) is taken over. Use it for full builds and test suites. Installs, focused tests and git do not need it.

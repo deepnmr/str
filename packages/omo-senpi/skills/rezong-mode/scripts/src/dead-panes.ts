@@ -1,4 +1,4 @@
-import type { DoriConfig } from "./config.ts";
+import type { RezongConfig } from "./config.ts";
 import { ALIVE_STATUSES, listPanes, readScreen } from "./panes.ts";
 import type { Runner } from "./run.ts";
 
@@ -15,7 +15,7 @@ export const newDeadPaneState = (): DeadPaneState => ({ unknown: new Map(), last
  * reads are a full loop interval apart and a screen mid-redraw never counts. A marker seen once is pending. Anything
  * else is unrecognised, counted per pane, with one alert after UNRECOGNISED_ALERT_AFTER ticks in a row.
  */
-export const deadPaneTick = async (run: Runner, config: DoriConfig, seen: Set<string>, hourKey: string, state: DeadPaneState = newDeadPaneState()): Promise<string[]> => {
+export const deadPaneTick = async (run: Runner, config: RezongConfig, seen: Set<string>, hourKey: string, state: DeadPaneState = newDeadPaneState()): Promise<string[]> => {
   const out: string[] = [];
   const watch = new Set(config.workspaces);
   const skip = new Set([config.leadPane, ...config.ignorePanes].filter(Boolean));
