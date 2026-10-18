@@ -35,7 +35,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function readOmoJson(homeDir: string): Record<string, unknown> {
-	const value: unknown = parse(readFileSync(join(homeDir, ".omo", "omo.jsonc"), "utf-8"))
+	// Migrations into a home without a config create str.jsonc (omo-config-core DEFAULT_OMO_CONFIG_FILE_NAME).
+	const value: unknown = parse(readFileSync(join(homeDir, ".omo", "str.jsonc"), "utf-8"))
 	if (!isRecord(value)) throw new Error("Expected an omo JSONC object")
 	return value
 }
@@ -134,7 +135,7 @@ describe("getCodexOmoConfig", () => {
 		expect(result.sources).toContainEqual({
 			exists: false,
 			loaded: false,
-			path: join(homeDir, ".omo", "omo.jsonc"),
+			path: join(homeDir, ".omo", "str.jsonc"),
 			scope: "user",
 		})
 	})

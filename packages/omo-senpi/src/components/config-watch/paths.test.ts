@@ -86,7 +86,7 @@ describe("resolveOmoConfigWatchTargets", () => {
       readFileSync: () => "",
     })).toEqual([workConfigPath, projectConfigPath, cwdConfigPath])
     expect(loaderPaths.map((candidate) => candidate.path)).toEqual([
-      join(userConfigDirectory, "omo.jsonc"),
+      join(userConfigDirectory, "str.jsonc"),
       workConfigPath,
       projectConfigPath,
       cwdConfigPath,
@@ -118,7 +118,7 @@ describe("resolveOmoConfigWatchTargets", () => {
 
     // A new invalid config is rejected without a reload, so the original ancestor
     // watch must also receive the later child-file fix that clears the rejection.
-    expect(creationTarget?.filterGlobs).toEqual(["/.omo", "/.omo/omo.jsonc", "/.omo/omo.json"])
+    expect(creationTarget?.filterGlobs).toEqual(["/.omo", "/.omo/str.jsonc", "/.omo/str.json", "/.omo/omo.jsonc", "/.omo/omo.json"])
   })
 
   it("#given a symlinked project .omo directory #when resolving targets #then ignores the symlinked config directory", () => {
@@ -170,6 +170,8 @@ describe("resolveOmoConfigWatchTargets", () => {
     expect(resolution.userConfigCreationWatched).toBe(true)
     expect(targetFor(resolution.targets, userConfigDirectory, "/omo.jsonc")).toBe(true)
     expect(targetFor(resolution.targets, userConfigDirectory, "/omo.json")).toBe(true)
+    expect(targetFor(resolution.targets, userConfigDirectory, "/str.jsonc")).toBe(true)
+    expect(targetFor(resolution.targets, userConfigDirectory, "/str.json")).toBe(true)
   })
 
   it("#given cwd at HOME with the default install layout #when resolving targets #then retains the ~/.omo config target", () => {
@@ -201,6 +203,8 @@ describe("resolveOmoConfigWatchTargets", () => {
     expect(resolution.targets.some((target) => target.path === fixture.homeDir && target.filterGlobs.includes("/.omo"))).toBe(true)
     expect(resolution.targets.find((target) => target.path === fixture.homeDir && target.filterGlobs.includes("/.omo"))?.filterGlobs).toEqual([
       "/.omo",
+      "/.omo/str.jsonc",
+      "/.omo/str.json",
       "/.omo/omo.jsonc",
       "/.omo/omo.json",
     ])
@@ -274,7 +278,7 @@ describe("resolveOmoConfigWatchTargets", () => {
     const creationTargets = targets.filter((target) => target.filterGlobs.some((glob) => glob.endsWith(".omo")))
     expect(creationTargets.length).toBeGreaterThan(0)
     for (const target of creationTargets) {
-      expect(target.filterGlobs).toEqual(["/.omo", "/.omo/omo.jsonc", "/.omo/omo.json"])
+      expect(target.filterGlobs).toEqual(["/.omo", "/.omo/str.jsonc", "/.omo/str.json", "/.omo/omo.jsonc", "/.omo/omo.json"])
     }
   })
 
@@ -283,7 +287,7 @@ describe("resolveOmoConfigWatchTargets", () => {
     const env = { HOME: fixture.homeDir, XDG_CONFIG_HOME: fixture.xdgConfigHome, SENPI_CODING_AGENT_DIR: fixture.agentDir }
     const targets = resolveOmoConfigWatchTargets({ cwd: fixture.cwd, env, platform: "linux" })
     const userCreationTarget = targets.find((target) => target.path === fixture.homeDir && target.filterGlobs.includes("/.omo"))
-    expect(userCreationTarget?.filterGlobs).toEqual(["/.omo", "/.omo/omo.jsonc", "/.omo/omo.json"])
+    expect(userCreationTarget?.filterGlobs).toEqual(["/.omo", "/.omo/str.jsonc", "/.omo/str.json", "/.omo/omo.jsonc", "/.omo/omo.json"])
   })
 
   it("#given an existing .omo directory holding runtime state #when resolving targets #then its config globs are root-anchored so the subtree is not scanned", () => {
@@ -299,7 +303,7 @@ describe("resolveOmoConfigWatchTargets", () => {
       platform: "linux",
     })
     const configTarget = targets.find((target) => target.path === omoDirectory)
-    expect(configTarget?.filterGlobs).toEqual(["/omo.jsonc", "/omo.json"])
+    expect(configTarget?.filterGlobs).toEqual(["/str.jsonc", "/str.json", "/omo.jsonc", "/omo.json"])
   })
 
   it("#given a Plan 9 project filesystem #when resolving targets #then skips project and ancestor watches while retaining native user config", () => {

@@ -46,7 +46,7 @@ function opencodeUser(): Sandbox {
   })
   write(join(opencodeDir, "skills", "release-notes", "SKILL.md"), "---\nname: release-notes\ndescription: notes\n---\nbody\n")
   write(join(opencodeDir, "skills", "broken", "README.md"), "not a skill\n")
-  return { home, agentDir: join(home, ".str", "agent"), omoConfig: join(home, ".str", "omo.jsonc") }
+  return { home, agentDir: join(home, ".str", "agent"), omoConfig: join(home, ".str", "str.jsonc") }
 }
 
 function env(item: Sandbox): NodeJS.ProcessEnv {

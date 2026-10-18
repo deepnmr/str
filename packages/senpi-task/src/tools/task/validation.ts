@@ -78,7 +78,7 @@ export type RunInBackgroundResolution =
 const BOTH_TARGETS_MESSAGE = "Provide EITHER category OR subagent_type, not both. Remove one and retry."
 
 const CATEGORY_WITH_MODEL_MESSAGE =
-  "Provide EITHER category OR model, never both. A category-routed task always takes its model from the omo.json category config; a call-site model override would silently bypass that routing. Remove model and retry, or use subagent_type for an explicit-model spawn, or configure categories.<name>.models in omo.json."
+  "Provide EITHER category OR model, never both. A category-routed task always takes its model from the str.json category config; a call-site model override would silently bypass that routing. Remove model and retry, or use subagent_type for an explicit-model spawn, or configure categories.<name>.models in str.json."
 
 const NO_TARGET_MESSAGE =
   'You MUST provide EITHER category OR subagent_type. Omitting BOTH will FAIL. Example: task(category="quick", prompt="...") or task(subagent_type="plan-reviewer", prompt="...").'

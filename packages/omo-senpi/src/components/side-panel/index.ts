@@ -42,7 +42,7 @@ export function createSidePanelComponent(options: SidePanelComponentOptions = {}
       // is honored below.
       pi.registerFlag(SIDE_PANEL_FLAG, {
         type: "boolean",
-        description: "Force the omo side panel on for this run; side_panel.enabled in omo.json is the persistent switch.",
+        description: "Force the omo side panel on for this run; side_panel.enabled in str.json is the persistent switch.",
       })
 
       const cwd = pi.cwd ?? process.cwd()

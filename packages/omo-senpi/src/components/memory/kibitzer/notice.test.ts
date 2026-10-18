@@ -93,7 +93,7 @@ describe("kibitzer gate notice", () => {
     }
     const rendered = renderKibitzerGateEntry(entry(record), { expanded: false }, theme)?.render(160).join("\n")
     expect(rendered).toContain("last failed model: devin/swe-2-low (memory recall category \"quick\")")
-    expect(rendered).toContain("after 3 consecutive failures; set categories.quick.model (or memory.recall.category) in omo.json to a model that answers")
+    expect(rendered).toContain("after 3 consecutive failures; set categories.quick.model (or memory.recall.category) in str.json to a model that answers")
     expect(rendered).not.toContain("check Kibitzer model/provider settings")
   })
 

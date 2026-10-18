@@ -34,6 +34,12 @@ export function runtimeHome(env = process.env) {
   return env.HOME || env.USERPROFILE || homedir()
 }
 
+/**
+ * Config file names in the str home, highest precedence first: mirrors omo-config-core
+ * loader/paths.ts OMO_CONFIG_FILE_NAMES (the launcher is plain JS and cannot import it).
+ */
+export const OMO_CONFIG_FILE_NAMES = ["str.jsonc", "str.json", "omo.jsonc", "omo.json"]
+
 /** Per-user str home: OMO_HOME_DIR when set, otherwise <home>/.str. */
 export function brandHome(env = process.env, home = runtimeHome(env)) {
   return env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(home, HOME_DIRNAME)

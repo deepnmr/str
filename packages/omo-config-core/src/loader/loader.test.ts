@@ -174,8 +174,8 @@ describe("loadOmoConfig", () => {
   test("#given malformed and unreadable configs #when loading #then defaults survive and typed diagnostics identify paths", () => {
     // given
     const fixture = makeFixture()
-    const unreadablePath = join(fixture.projectDir, ".omo", "omo.jsonc")
-    writeJsonc(join(fixture.homeDir, ".omo", "omo.jsonc"), `{"task":{"default_concurrency":"five"}}`)
+    const unreadablePath = join(fixture.projectDir, ".omo", "str.jsonc")
+    writeJsonc(join(fixture.homeDir, ".omo", "str.jsonc"), `{"task":{"default_concurrency":"five"}}`)
     writeJsonc(unreadablePath, `{"task":{"default_concurrency":3}}`)
 
     // when

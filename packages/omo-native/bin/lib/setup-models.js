@@ -4,7 +4,7 @@ export const MODEL_GUIDE_LINE = "Model-to-agent guidance: docs/guide/agent-model
 // providers and model choices themselves, so a placeholder would describe by hand what setup does.
 export function formatModelTemplate() {
   return [
-    "Ready-to-paste omo.json models catalog template:",
+    "Ready-to-paste str.json models catalog template:",
     JSON.stringify({
       models: {
         primary: { model: "<provider>/<model-id>", reasoning: "<off|low|medium|high|max>" },

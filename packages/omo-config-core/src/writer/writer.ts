@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto"
 import { dirname, join, posix } from "node:path"
 import { parseJsoncSafe } from "../internal/jsonc-parse"
-import { resolveUserOmoConfigPath } from "../loader"
+import { resolveOmoConfigFileIn, resolveUserOmoConfigPath } from "../loader"
 import { applyOmoConfigEdit } from "./surgical-edit"
 import {
   DEFAULT_WRITE_FILE_SYSTEM,
@@ -61,16 +61,8 @@ function writeBackupFrom(basePath: string, content: string, fileSystem: typeof D
 function resolveWritePath(options: UpdateOmoConfigOptions): string {
   if (options.targetPath !== undefined) return options.targetPath
   const fileSystem = options.fileSystem ?? DEFAULT_WRITE_FILE_SYSTEM
-  if (options.scope === "user") {
-    const jsoncPath = resolveUserOmoConfigPath(options.env)
-    if (fileSystem.existsSync(jsoncPath)) return jsoncPath
-    const jsonPath = join(dirname(jsoncPath), "omo.json")
-    return fileSystem.existsSync(jsonPath) ? jsonPath : jsoncPath
-  }
-  const jsoncPath = join(options.projectDir ?? process.cwd(), ".omo", "omo.jsonc")
-  if (fileSystem.existsSync(jsoncPath)) return jsoncPath
-  const jsonPath = join(dirname(jsoncPath), "omo.json")
-  return fileSystem.existsSync(jsonPath) ? jsonPath : jsoncPath
+  if (options.scope === "user") return resolveUserOmoConfigPath(options.env, fileSystem)
+  return resolveOmoConfigFileIn(join(options.projectDir ?? process.cwd(), ".omo"), (path) => fileSystem.existsSync(path)).path
 }
 
 function directoryPath(path: string): string {

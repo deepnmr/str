@@ -1,4 +1,4 @@
-import { hasMigrationMarker } from "@oh-my-opencode/omo-config-core"
+import { hasMigrationMarker, OMO_CONFIG_FILE_NAMES } from "@oh-my-opencode/omo-config-core"
 import { parse } from "jsonc-parser/lib/esm/main.js"
 import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
@@ -77,7 +77,7 @@ function migrateFixSuffix(parsed: unknown): string {
 function userConfigPaths(): readonly string[] {
   const home = process.env.HOME ?? process.env.USERPROFILE
   if (home === undefined || home.length === 0) return []
-  return [join(home, ".omo", "omo.jsonc"), join(home, ".omo", "omo.json")]
+  return OMO_CONFIG_FILE_NAMES.map((name) => join(home, ".omo", name))
 }
 
 export async function checkDeprecatedReasoningKeys(): Promise<CheckResult> {

@@ -114,7 +114,7 @@ describe("updateOmoConfig", () => {
   test("#given missing user config #when editing #then file is created with header and parsed value", () => {
     // given
     const fixture = makeFixture()
-    const configPath = join(fixture.homeDir, ".omo", "omo.jsonc")
+    const configPath = join(fixture.homeDir, ".omo", "str.jsonc")
 
     // when
     const result = updateOmoConfig({
@@ -188,6 +188,25 @@ describe("updateOmoConfig", () => {
     expect(loaded.config.task?.default_concurrency).toBe(9)
     expect(loaded.config.task?.wait.default_ms).toBe(12000)
     expect(loaded.config.task?.wait.max_ms).toBe(70000)
+  })
+
+  test("#given no user config #when editing #then writer creates str.jsonc and the loader reads it", () => {
+    // given
+    const fixture = makeFixture()
+
+    // when
+    const result = updateOmoConfig({
+      scope: "user",
+      edits: [{ path: ["task", "default_concurrency"], value: 7 }],
+      env: { HOME: fixture.homeDir },
+      platform: "linux",
+    })
+    const loaded = loadOmoConfig({ cwd: fixture.projectDir, env: { HOME: fixture.homeDir }, platform: "linux" })
+
+    // then
+    expect(result.path).toBe(join(fixture.homeDir, ".omo", "str.jsonc"))
+    expect(existsSync(join(fixture.homeDir, ".omo", "omo.jsonc"))).toBe(false)
+    expect(loaded.config.task?.default_concurrency).toBe(7)
   })
 
   test("#given writer cannot create temp file #when editing #then typed error surfaces and no partial remains", () => {
@@ -269,7 +288,7 @@ describe("updateOmoConfig", () => {
     const created = updateOmoConfig({ scope: "user", edits: [{ path: ["task", "default_concurrency"], value: 3 }], env })
 
     // then
-    expect(created.path).toBe(join(fixture.homeDir, ".omo", "omo.jsonc"))
+    expect(created.path).toBe(join(fixture.homeDir, ".omo", "str.jsonc"))
     expect(readFileSync(join(legacyDir, "omo.jsonc"), "utf-8")).toContain(`"default_concurrency":99`)
 
     // when an omo.json already exists it is edited in place, still inside ~/.omo

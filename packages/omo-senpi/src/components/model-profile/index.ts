@@ -203,7 +203,7 @@ function logRetiredProfileOnce(ctx: ComponentContext, logged: Set<string>, name:
   if (logged.has(name)) return
   logged.add(name)
   ctx.logger.info(
-    `omo-senpi: model_profile "${name}" is retired; starting on Daily · Normal (or the first lane that resolves). Remove it from omo.json to silence this.`,
+    `omo-senpi: model_profile "${name}" is retired; starting on Daily · Normal (or the first lane that resolves). Remove it from str.json to silence this.`,
   )
 }
 

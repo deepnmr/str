@@ -84,7 +84,7 @@ function doctorLines(ws: Workspace, loadTaskConfig: () => unknown = () => taskCo
   })
 }
 
-const legacyWarn = (ws: Workspace, key: string, advice = "move it to ~/.str/omo.jsonc") =>
+const legacyWarn = (ws: Workspace, key: string, advice = "move it to ~/.str/str.jsonc") =>
   `WARN task.${key}: read from deprecated ${join(ws.agentDir, "omo.json")}; ${advice}`
 
 const configWarns = (lines: string[]) => lines.filter((line) => line.startsWith("WARN task."))
@@ -200,7 +200,7 @@ describe("omo daemon task.host_idle_exit_ms source (#9192)", () => {
 
     expect(runIdleExitMs(ws)).toBe("1500")
     expect(configWarns(doctorLines(ws))).toEqual([
-      legacyWarn(ws, "host_idle_exit_ms", "move it to ~/.str/omo.jsonc as whole milliseconds"),
+      legacyWarn(ws, "host_idle_exit_ms", "move it to ~/.str/str.jsonc as whole milliseconds"),
     ])
   })
 

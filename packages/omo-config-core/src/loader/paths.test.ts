@@ -71,7 +71,7 @@ describe("resolveUserOmoConfigDirectory", () => {
 })
 
 describe("resolveUserOmoConfigPath", () => {
-  test("#given a HOME #when resolving the user config path #then it is ~/.omo/omo.jsonc", () => {
+  test("#given a HOME #when resolving the user config path #then it is ~/.omo/str.jsonc", () => {
     // given
     const homeDir = makeHome()
 
@@ -79,7 +79,7 @@ describe("resolveUserOmoConfigPath", () => {
     const path = resolveUserOmoConfigPath({ HOME: homeDir })
 
     // then
-    expect(path).toBe(join(homeDir, ".omo", "omo.jsonc"))
+    expect(path).toBe(join(homeDir, ".omo", "str.jsonc"))
   })
 
   test("#given OMO_HOME_DIR is set #when resolving the user config path #then it replaces ~/.omo as the brand home", () => {
@@ -87,7 +87,7 @@ describe("resolveUserOmoConfigPath", () => {
     const path = resolveUserOmoConfigPath({ HOME: "/h", OMO_HOME_DIR: "/x/.str" })
 
     // then
-    expect(path).toBe(join("/x/.str", "omo.jsonc"))
+    expect(path).toBe(join("/x/.str", "str.jsonc"))
   })
 
   test("#given OMO_HOME_DIR is blank #when resolving the user config path #then it falls back to ~/.omo", () => {
@@ -95,7 +95,7 @@ describe("resolveUserOmoConfigPath", () => {
     const path = resolveUserOmoConfigPath({ HOME: "/h", OMO_HOME_DIR: "   " })
 
     // then
-    expect(path).toBe(join("/h", ".omo", "omo.jsonc"))
+    expect(path).toBe(join("/h", ".omo", "str.jsonc"))
   })
 })
 
@@ -128,6 +128,51 @@ describe("resolveOmoConfigPaths user candidate", () => {
     expect(candidates[0]).toEqual({ path: join(homeDir, ".omo", "omo.json"), scope: "user" })
   })
 
+  test("#given ~/.omo/str.json and ~/.omo/omo.jsonc both exist #when resolving candidates #then str.json wins", () => {
+    // given
+    const homeDir = makeHome()
+    const cwd = join(homeDir, "work")
+    mkdirSync(cwd, { recursive: true })
+    writeFile(join(homeDir, ".omo", "str.json"), "{}")
+    writeFile(join(homeDir, ".omo", "omo.jsonc"), "{}")
+
+    // when
+    const candidates = resolveOmoConfigPaths({ cwd, env: { HOME: homeDir }, platform: "linux" })
+
+    // then
+    expect(candidates[0]).toEqual({ path: join(homeDir, ".omo", "str.json"), scope: "user" })
+  })
+
+  test("#given ~/.omo/str.jsonc and ~/.omo/str.json both exist #when resolving candidates #then str.jsonc wins", () => {
+    // given
+    const homeDir = makeHome()
+    const cwd = join(homeDir, "work")
+    mkdirSync(cwd, { recursive: true })
+    writeFile(join(homeDir, ".omo", "str.jsonc"), "{}")
+    writeFile(join(homeDir, ".omo", "str.json"), "{}")
+
+    // when
+    const candidates = resolveOmoConfigPaths({ cwd, env: { HOME: homeDir }, platform: "linux" })
+
+    // then
+    expect(candidates[0]).toEqual({ path: join(homeDir, ".omo", "str.jsonc"), scope: "user" })
+  })
+
+  test("#given a project .omo with str.json beside omo.jsonc #when resolving candidates #then the project layer is str.json", () => {
+    // given
+    const homeDir = makeHome()
+    const projectDir = join(homeDir, "work", "project")
+    mkdirSync(projectDir, { recursive: true })
+    writeFile(join(projectDir, ".omo", "str.json"), "{}")
+    writeFile(join(projectDir, ".omo", "omo.jsonc"), "{}")
+
+    // when
+    const candidates = resolveOmoConfigPaths({ cwd: projectDir, env: { HOME: homeDir }, platform: "linux" })
+
+    // then
+    expect(candidates[1]).toEqual({ path: join(projectDir, ".omo", "str.json"), scope: "project" })
+  })
+
   test("#given a legacy ~/.config/omo/omo.jsonc and no ~/.omo config #when resolving candidates #then the legacy file is never selected", () => {
     // given
     const homeDir = makeHome()
@@ -142,7 +187,7 @@ describe("resolveOmoConfigPaths user candidate", () => {
     expect(candidates.map((candidate) => candidate.path)).not.toContain(
       join(homeDir, ".config", "omo", "omo.jsonc"),
     )
-    expect(candidates[0]).toEqual({ path: join(homeDir, ".omo", "omo.jsonc"), scope: "user" })
+    expect(candidates[0]).toEqual({ path: join(homeDir, ".omo", "str.jsonc"), scope: "user" })
   })
 
   test("#given a project .omo config #when resolving candidates #then the user candidate stays first and project layers follow", () => {

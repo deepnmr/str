@@ -2,6 +2,8 @@ import { existsSync } from "node:fs"
 import { posix, win32 } from "node:path"
 
 import {
+  DEFAULT_OMO_CONFIG_FILE_NAME,
+  OMO_CONFIG_FILE_NAMES,
   runMigrations,
   type MigrationBoundary,
   type MigrationClock,
@@ -121,8 +123,8 @@ export function runSenpiStartupMigration(options: SenpiStartupMigrationOptions):
   }
 }
 
-// The file omo-config-core's loader reads as the user layer: omo.jsonc, else omo.json; the
-// unification plan creates omo.jsonc.
+// The file omo-config-core's loader reads as the user layer (first of OMO_CONFIG_FILE_NAMES that
+// exists); a new file is DEFAULT_OMO_CONFIG_FILE_NAME.
 function userConfigPath(
   homeDir: string,
   environment: Readonly<Record<string, string | undefined>>,
@@ -131,9 +133,8 @@ function userConfigPath(
 ): string {
   const exists = fileSystem?.existsSync ?? existsSync
   const brandDir = environment["OMO_HOME_DIR"]?.trim() || pathOperations.join(homeDir, ".omo")
-  const jsonc = pathOperations.join(brandDir, "omo.jsonc")
-  const json = pathOperations.join(brandDir, "omo.json")
-  return exists(jsonc) || !exists(json) ? jsonc : json
+  const existing = OMO_CONFIG_FILE_NAMES.map((name) => pathOperations.join(brandDir, name)).find((path) => exists(path))
+  return existing ?? pathOperations.join(brandDir, DEFAULT_OMO_CONFIG_FILE_NAME)
 }
 
 export function createConfigStartupComponent(options: ConfigStartupComponentOptions = {}): OmoSenpiComponent {

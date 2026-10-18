@@ -111,7 +111,7 @@ describe("terminalFailureMessage", () => {
     expect(message).toContain("re-authenticate opencode-go")
     expect(message).toContain("Provider authentication settings")
     expect(message).toContain("/login opencode-go")
-    expect(message).toContain("omo.json")
+    expect(message).toContain("str.json")
   })
 
   test("#given a single-model lane whose only model hits an account usage limit #when the terminal message is built #then it says the chain is exhausted and how to recover", () => {
@@ -123,7 +123,7 @@ describe("terminalFailureMessage", () => {
     expect(message.startsWith(limit)).toBe(true)
     expect(message).toContain("chatgpt-subscription/gpt-6-astra reached its usage limit, so this task stopped.")
     expect(message).toContain("No other model in its fallback chain could take over.")
-    expect(message).toContain("omo.json")
+    expect(message).toContain("str.json")
   })
 
   test("#given a usage limit while fallback rungs remain #when the terminal message is built #then it does not claim the chain is exhausted", () => {

@@ -50,7 +50,7 @@ describe("buildTaskExecute plan errors", () => {
     // then
     const text = result.content[0]?.type === "text" ? result.content[0].text : ""
     expect(text).toContain("Valid category names: deep, quick")
-    expect(text).toContain("omo.json")
+    expect(text).toContain("str.json")
     expect(text).not.toContain('Pass model:')
     expect(text).not.toContain("Available categories:")
   })

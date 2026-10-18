@@ -73,7 +73,7 @@ export async function resolveTeamSpec(
     ? ` (${registry.errors.length} team spec(s) failed to load: ${registry.errors.map((error) => error.name).sort().join(", ")}.)`
     : ""
   throw new SenpiTeamSpecError(
-    `team '${teamName}' not found in project .omo/teams or omo.json.${declaredSuffix}${brokenSuffix}`,
+    `team '${teamName}' not found in project .omo/teams or str.json.${declaredSuffix}${brokenSuffix}`,
     "INVALID_SPEC",
     teamName,
   )

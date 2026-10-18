@@ -313,7 +313,7 @@ export function resolveCategory<TModel extends SenpiModelPort>(
     return {
       kind: "disabled",
       category: categoryName,
-      reason: `Category "${categoryName}" is disabled by omo.json`,
+      reason: `Category "${categoryName}" is disabled by str.json`,
       availableCategories: gatedAvailableCategories(omoConfig, senpiModelRegistry),
     }
   }

@@ -2,7 +2,7 @@ import { existsSync, readFileSync, realpathSync } from "node:fs"
 import { createRequire } from "node:module"
 import { isAbsolute, join, relative, sep } from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
-import { brandHome, canonicalAgentDir, runtimeHome } from "./agent-dir.js"
+import { brandHome, canonicalAgentDir, OMO_CONFIG_FILE_NAMES, runtimeHome } from "./agent-dir.js"
 import { parseJsonc } from "./jsonc.js"
 import { packageRoot } from "./package-paths.js"
 
@@ -127,10 +127,7 @@ export async function runGatewayCommand(args, options = {}) {
 
 function userConfigPath(env) {
   const dir = brandHome(env)
-  const jsonc = join(dir, "omo.jsonc")
-  if (existsSync(jsonc)) return jsonc
-  const json = join(dir, "omo.json")
-  return existsSync(json) ? json : null
+  return OMO_CONFIG_FILE_NAMES.map((name) => join(dir, name)).find((path) => existsSync(path)) ?? null
 }
 
 function isRecord(value) {

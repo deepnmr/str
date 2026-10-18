@@ -2,7 +2,7 @@ import { closeSync, lstatSync, openSync, readFileSync, readSync, realpathSync, s
 import { homedir } from "node:os"
 import { delimiter, dirname, isAbsolute, join, win32 } from "node:path"
 import { parseJsonc } from "./jsonc.js"
-import { brandHome } from "./agent-dir.js"
+import { brandHome, OMO_CONFIG_FILE_NAMES } from "./agent-dir.js"
 import { COMMAND, PACKAGE_NAME } from "./brand.js"
 import { releaseChannel } from "./package-paths.js"
 import { opencodeConfigSources } from "./setup-opencode-assets.js"
@@ -335,13 +335,13 @@ export function formatMigrationLines({ shadowing, nativeDirectory, legacyPackage
 // The OpenCode edition's model settings Native does not use: the same line Native's first start
 // prints (omo-senpi config-startup), for as long as the gap exists.
 export function openCodeRoutingReport({ env, homeDir }) {
-  const path = ["omo.jsonc", "omo.json"].map((name) => join(brandHome(env, homeDir), name)).find((candidate) => readWholeFile(candidate) !== undefined)
+  const path = OMO_CONFIG_FILE_NAMES.map((name) => join(brandHome(env, homeDir), name)).find((candidate) => readWholeFile(candidate) !== undefined)
   let document = {}
   if (path !== undefined) {
     try {
       document = parseJsonc(readWholeFile(path))
     } catch {
-      return [] // The config loader reports an unreadable omo.jsonc itself.
+      return [] // The config loader reports an unreadable config file itself.
     }
   }
   const gap = openCodeRoutingGap(document, readEditionRouting({ home: homeDir, env }))

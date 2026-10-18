@@ -122,12 +122,12 @@ function total(coverage) {
 function gapLine(gap) {
   if (gap.unlistedProviderModel !== undefined) {
     const gateway = gap.unlistedProviderModel.slice(0, gap.unlistedProviderModel.indexOf("/"))
-    return `Category "${gap.name}" is unavailable: only ${gateway}, which its chain does not list, serves its models, and omo never bills a builtin category to an unlisted provider. Connect one of its providers (${gap.providers.join(", ")}) with /login <provider>, or opt in with categories.${gap.name}.model = "${gap.unlistedProviderModel}" in omo.json.`
+    return `Category "${gap.name}" is unavailable: only ${gateway}, which its chain does not list, serves its models, and omo never bills a builtin category to an unlisted provider. Connect one of its providers (${gap.providers.join(", ")}) with /login <provider>, or opt in with categories.${gap.name}.model = "${gap.unlistedProviderModel}" in str.json.`
   }
   if (gap.providers.length === 0) {
-    return `Category "${gap.name}" has no usable model: your connected providers serve none of its fallback-chain models. Pin categories.${gap.name}.model in omo.json.`
+    return `Category "${gap.name}" has no usable model: your connected providers serve none of its fallback-chain models. Pin categories.${gap.name}.model in str.json.`
   }
-  return `Category "${gap.name}" has no usable model: none of its fallback-chain providers are connected (${gap.providers.join(", ")}). Connect one with /login <provider>, or pin categories.${gap.name}.model in omo.json.`
+  return `Category "${gap.name}" has no usable model: none of its fallback-chain providers are connected (${gap.providers.join(", ")}). Connect one with /login <provider>, or pin categories.${gap.name}.model in str.json.`
 }
 
 /** @param {CategoryCoverage} coverage */

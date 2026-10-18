@@ -51,9 +51,9 @@ export function categoryUnavailableText(
   const connect = `Connect one of its providers (${missingProviders.join(", ")}) with /login`
   if (unlistedProviderModel !== undefined) {
     const gateway = unlistedProviderModel.slice(0, unlistedProviderModel.indexOf("/"))
-    return `Category "${category}" is unavailable: only ${gateway}, which its chain does not list, serves its models, and omo never bills a builtin category to an unlisted provider. ${connect}, or opt in with categories.${category}.model = "${unlistedProviderModel}" in omo.json.`
+    return `Category "${category}" is unavailable: only ${gateway}, which its chain does not list, serves its models, and omo never bills a builtin category to an unlisted provider. ${connect}, or opt in with categories.${category}.model = "${unlistedProviderModel}" in str.json.`
   }
-  return `Category "${category}" has no usable model: none of its fallback-chain providers are connected (${missingProviders.join(", ")}). Connect one with /login, or pin categories.${category}.model in omo.json.`
+  return `Category "${category}" has no usable model: none of its fallback-chain providers are connected (${missingProviders.join(", ")}). Connect one with /login, or pin categories.${category}.model in str.json.`
 }
 
 /**

@@ -16,7 +16,7 @@
  * A key either file already has, in the harness block or the shared base, is never overwritten.
  */
 
-import { brandHome } from "./agent-dir.js"
+import { brandHome, OMO_CONFIG_FILE_NAMES } from "./agent-dir.js"
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { isDeepStrictEqual } from "node:util"
@@ -42,12 +42,12 @@ function readTarget(path) {
   }
 }
 
-// The file omo-config-core's loader reads as the user layer (loader/paths.ts): omo.jsonc, else
-// omo.json; a new file is omo.jsonc.
+// The file omo-config-core's loader reads as the user layer (loader/paths.ts OMO_CONFIG_FILE_NAMES):
+// str.jsonc, str.json, omo.jsonc, omo.json, first existing wins; a new file is str.jsonc.
 function omoTargetPath(home) {
-  const jsonc = join(brandHome({}, home), "omo.jsonc")
-  const json = join(brandHome({}, home), "omo.json")
-  return existsSync(jsonc) || !existsSync(json) ? jsonc : json
+  const dir = brandHome({}, home)
+  const existing = OMO_CONFIG_FILE_NAMES.map((name) => join(dir, name)).find((path) => existsSync(path))
+  return existing ?? join(dir, "str.jsonc")
 }
 
 // settings-manager.js `resolveSettingsSource`: settings.jsonc wins over settings.json.

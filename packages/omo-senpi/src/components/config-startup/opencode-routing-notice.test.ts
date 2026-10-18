@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
+import { resolveUserOmoConfigPath } from "@oh-my-opencode/omo-config-core"
 import { parse } from "jsonc-parser"
 
 import type { SenpiOmoConfigResult } from "../config-resolution"
@@ -37,8 +38,9 @@ function start(home: string) {
   return { migration, notices: notificationMessages(migration, EMPTY_CONFIG).map((notice) => notice.message) }
 }
 
+// The user layer the loader reads: the seeded omo.jsonc when present, else the str.jsonc a migration creates.
 function omoText(home: string): string {
-  return readFileSync(join(home, ".omo", "omo.jsonc"), "utf8")
+  return readFileSync(resolveUserOmoConfigPath({ HOME: home }), "utf8")
 }
 
 describe("OpenCode edition model settings at Native startup", () => {

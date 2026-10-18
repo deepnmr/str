@@ -67,7 +67,7 @@ describe("legacy config migration plans", () => {
       expect(configResult.status).toBe("migrated")
       expect(opencodeResult.status).toBe("migrated")
       expect(projectResult.status).toBe("migrated")
-      const userDocument = parse(readFileSync(join(homeDir, ".omo", "omo.jsonc"), "utf-8")) as Record<string, unknown>
+      const userDocument = parse(readFileSync(join(homeDir, ".omo", "str.jsonc"), "utf-8")) as Record<string, unknown>
       expect(userDocument._migrations).toEqual([
         CONFIG_JSONC_MIGRATION_ID,
         OPENCODE_CONFIG_MIGRATION_ID,

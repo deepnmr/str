@@ -17,7 +17,7 @@ export function reflectionRemediation(
   childLog?: ReflectionChildLog,
 ): string {
   if (isModelUnreachableDetail(detail)) {
-    return "no memory child can see the reflection model, not even with extensions loaded; set categories.<category>.model (or memory.reflection.category) in omo.json to a model from a core provider, or set memory.reflection.enabled to false"
+    return "no memory child can see the reflection model, not even with extensions loaded; set categories.<category>.model (or memory.reflection.category) in str.json to a model from a core provider, or set memory.reflection.enabled to false"
   }
   const combined = `${reason ?? ""} ${detail ?? ""}`.toLowerCase()
   if (combined.includes("budget_not_met")) {
@@ -25,7 +25,7 @@ export function reflectionRemediation(
   }
   // Pre-spawn resolution failure: no child ever ran, so never point at child-stderr.log here.
   if (combined.includes("category_unavailable") || combined.includes("could not resolve a usable model")) {
-    return "no connected provider offers a model for the memory reflection category; run /login <provider>, or pin categories.<category>.model (or memory.reflection.category) in omo.json"
+    return "no connected provider offers a model for the memory reflection category; run /login <provider>, or pin categories.<category>.model (or memory.reflection.category) in str.json"
   }
   // The senpi child prints `Error: Model "<selector>" not found. Use --list-models ...`, so the quoted
   // selector has to be matched too, otherwise a repeating model miss degrades to the generic child-log hint.

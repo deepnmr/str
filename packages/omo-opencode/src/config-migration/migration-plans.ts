@@ -1,4 +1,4 @@
-import type { MigrationSourceDescriptor, MigrationTransform } from "@oh-my-opencode/omo-config-core"
+import { DEFAULT_OMO_CONFIG_FILE_NAME, OMO_CONFIG_FILE_NAMES, type MigrationSourceDescriptor, type MigrationTransform } from "@oh-my-opencode/omo-config-core"
 
 import { discoverLegacyConfigGroups, CONFIG_JSONC_MIGRATION_ID, OPENCODE_CONFIG_MIGRATION_ID } from "./discovery"
 import { canonicalPath, discoveryFileSystem, hostPathOperations, pathKey, projectDirectories, userBrandDir } from "./discovery-paths"
@@ -14,7 +14,7 @@ import {
   transformSubscriptionProviderRename,
 } from "./subscription-provider-rename"
 import { hasLegacyCategoryNames, hasLegacyHarnessBlocks } from "@oh-my-opencode/omo-config-core"
-import type { ConfigMigrationDiscoveryOptions, DiscoveredLegacyConfigSource } from "./types"
+import type { ConfigMigrationDiscoveryOptions, ConfigMigrationPathOperations, DiscoveredLegacyConfigSource } from "./types"
 import type { ConfigMigrationTransformResult, OpenCodeTransformScope } from "./transform-types"
 
 export type LegacyConfigMigrationPlan = {
@@ -176,11 +176,22 @@ function subscriptionProviderRenamePlan(targetPath: string): LegacyConfigMigrati
 
 function existingOmoConfigPath(directory: string, options: ConfigMigrationDiscoveryOptions): string | undefined {
   const fileSystem = discoveryFileSystem(options)
-  for (const fileName of ["omo.jsonc", "omo.json"] as const) {
+  for (const fileName of OMO_CONFIG_FILE_NAMES) {
     const path = options.pathOperations.join(directory, fileName)
     if (fileSystem.existsSync(path)) return canonicalPath(path, options)
   }
   return undefined
+}
+
+// The file the loader reads as this directory's layer, so a migration never creates a str.jsonc
+// that would shadow an existing omo.json(c); a directory without one gets the default name.
+function omoConfigTargetPath(directory: string, pathOperations: ConfigMigrationPathOperations, options: ConfigMigrationDiscoveryOptions): string {
+  const fileSystem = discoveryFileSystem(options)
+  for (const fileName of OMO_CONFIG_FILE_NAMES) {
+    const path = pathOperations.join(directory, fileName)
+    if (fileSystem.existsSync(path)) return path
+  }
+  return pathOperations.join(directory, DEFAULT_OMO_CONFIG_FILE_NAME)
 }
 
 export function createLegacyConfigMigrationPlans(
@@ -189,7 +200,7 @@ export function createLegacyConfigMigrationPlans(
   const timestamp = backupTimestamp(options.backupTimestamp)
   const [openCodeGroup, configJsoncGroup] = discoverLegacyConfigGroups(options)
   const pathOperations = hostPathOperations(options)
-  const userTargetPath = pathOperations.join(userBrandDir(options), "omo.jsonc")
+  const userTargetPath = omoConfigTargetPath(userBrandDir(options), pathOperations, options)
   const userSources = openCodeGroup.sources.filter((source) => source.projectRoot === undefined)
   const projectSources = new Map<string, DiscoveredLegacyConfigSource[]>()
   for (const source of openCodeGroup.sources) {
@@ -206,7 +217,7 @@ export function createLegacyConfigMigrationPlans(
     projectInputs.push({
       scopes: [{ kind: "project", projectRoot }],
       sources,
-      targetPath: pathOperations.join(projectRoot, ".omo", "omo.jsonc"),
+      targetPath: omoConfigTargetPath(pathOperations.join(projectRoot, ".omo"), pathOperations, options),
     })
   }
   const openCodeInputs: OpenCodePlanInput[] = [

@@ -28,6 +28,7 @@ describe("runMigration transaction ownership", () => {
           env: writeInput.env,
           fileSystem: writeInput.fileSystem,
           scope: "user",
+          targetPath: writeInput.targetPath,
         })
       },
     })
@@ -111,6 +112,7 @@ describe("runMigration transaction ownership", () => {
           env: writeInput.env,
           fileSystem: writeInput.fileSystem,
           scope: "user",
+          targetPath: writeInput.targetPath,
         })
       },
     })

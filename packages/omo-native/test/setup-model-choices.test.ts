@@ -29,7 +29,7 @@ function sandbox(): Sandbox {
     home,
     agentDir: join(home, ".str", "agent"),
     opencodeDir: join(home, ".config", "opencode"),
-    omoConfig: join(home, ".str", "omo.jsonc"),
+    omoConfig: join(home, ".str", "str.jsonc"),
     settings: join(home, ".str", "agent", "settings.json"),
   }
 }
@@ -161,8 +161,8 @@ describe("omo setup model choices", () => {
       expect(loaded.config.categories?.["deep-low"]?.models?.[0]).toBe("kimi-coding/k3")
       expect(loaded.config.telemetry?.enabled).toBe(false)
       expect(readJson(item.settings)).toEqual({ defaultProvider: "anthropic", defaultModel: "claude-opus-5-5" })
-      expect(readdirSync(join(item.home, ".str")).filter((name) => name.startsWith("omo.jsonc.bak-"))).toHaveLength(1)
-      expect(readFileSync(join(item.home, ".str", readdirSync(join(item.home, ".str")).find((name) => name.startsWith("omo.jsonc.bak-"))!), "utf8")).toBe(original)
+      expect(readdirSync(join(item.home, ".str")).filter((name) => name.startsWith("str.jsonc.bak-"))).toHaveLength(1)
+      expect(readFileSync(join(item.home, ".str", readdirSync(join(item.home, ".str")).find((name) => name.startsWith("str.jsonc.bak-"))!), "utf8")).toBe(original)
       expect(stdout).toContain("model-choices-skipped-existing: default model, category quick")
     })
   })

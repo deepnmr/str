@@ -9,7 +9,7 @@ export const TASK_PROMPT_SNIPPET = "Spawn one child or fan out a batch; use task
 
 export const TASK_PROMPT_GUIDELINES: readonly string[] = [
   "Spawn children with run_in_background=true.",
-  "NEVER pass model together with category: category-routed tasks take their model from omo.json (categories.<name>.models).",
+  "NEVER pass model together with category: category-routed tasks take their model from str.json (categories.<name>.models).",
   "Continue an existing child with task_send(to=\"st_...\", message=\"...\"); task always spawns.",
   "Use task_output for one midpoint status or transcript peek; use task_cancel to end a child.",
   "Pass task_summary (one line, <=80 chars) on every spawn: the user's footer/widget UI shows it instead of the raw prompt, so it should say WHAT was delegated.",
@@ -61,7 +61,7 @@ load_skills prepends named skills. run_in_background=true returns the task id at
 run_in_background is batch-wide: set it once at the top level. An item-level copy must agree with the top-level value and every other item, or the call fails with invalid_arguments.
 name is an optional stable handle. model is an explicit override for subagent_type spawns ONLY.
 isolated runs a child in a checkout clone; it defaults to task.isolation.enabled. apply controls merge-back; false retains artifacts only. merge selects patch or branch. Batch items inherit these three options unless overridden. apply and merge require isolation to be enabled.
-NEVER combine model with category: a category-routed task always takes its model from omo.json (categories.<name>.models), so passing both fails with invalid_arguments.
+NEVER combine model with category: a category-routed task always takes its model from str.json (categories.<name>.models), so passing both fails with invalid_arguments.
 task_send continues an existing child; task always spawns.
 Prompts MUST be in English.`
 }

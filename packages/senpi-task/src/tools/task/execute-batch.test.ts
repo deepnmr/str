@@ -265,7 +265,7 @@ describe("buildTaskExecute batch fanout", () => {
     // then
     const text = textOf(output)
     expect(text).toContain("Valid category names: deep, quick")
-    expect(text).toContain("omo.json")
+    expect(text).toContain("str.json")
     expect(text).not.toContain('Pass model:')
     expect(text).not.toContain("Available categories:")
   })

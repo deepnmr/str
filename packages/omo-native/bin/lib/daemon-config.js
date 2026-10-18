@@ -78,8 +78,8 @@ function migrationAdvice({ key, value }) {
   if (key === "host_engine_policy" && value === "never") {
     return '"never" is a command-line policy only (the config key accepts upgrade|fallback); pass --no-upgrade instead'
   }
-  if (key === "host_idle_exit_ms" && !Number.isInteger(value)) return "move it to ~/.str/omo.jsonc as whole milliseconds"
-  return "move it to ~/.str/omo.jsonc"
+  if (key === "host_idle_exit_ms" && !Number.isInteger(value)) return "move it to ~/.str/str.jsonc as whole milliseconds"
+  return "move it to ~/.str/str.jsonc"
 }
 
 /** One doctor line per key the deprecated file supplied; none when the loader supplies them or cannot run. */

@@ -2,7 +2,7 @@ import { basename, dirname, resolve } from "node:path"
 import { isPlainObject } from "../internal/plain-object"
 import { parseJsoncSafe } from "../internal/jsonc-parse"
 import { toPosixPath } from "../internal/posix-path"
-import { resolveUserOmoConfigDirectory } from "../loader"
+import { OMO_CONFIG_FILE_NAMES, resolveUserOmoConfigDirectory } from "../loader"
 import { OMO_CONFIG_HARNESS_IDS, OMO_CONFIG_LEGACY_HARNESS_IDS, OmoConfigSchema, harnessBlockKey } from "../schema"
 import { updateOmoConfig } from "../writer"
 import { diffEdits, withoutMarker } from "./diff-edits"
@@ -87,13 +87,17 @@ function validateTarget(targetPath: string, document: Readonly<Record<string, un
   throw new MigrationValidationError(targetPath, detail)
 }
 
+function isOmoConfigFileName(fileName: string): boolean {
+  return (OMO_CONFIG_FILE_NAMES as readonly string[]).includes(fileName)
+}
+
 function writerInput(targetPath: string, env: MigrationEnvironment): { readonly projectDir?: string; readonly scope: "project" | "user" } {
   const userDirectory = toPosixPath(resolveUserOmoConfigDirectory(env))
   const fileName = basename(targetPath)
-  if (toPosixPath(dirname(targetPath)) === userDirectory && (fileName === "omo.json" || fileName === "omo.jsonc")) {
+  if (toPosixPath(dirname(targetPath)) === userDirectory && isOmoConfigFileName(fileName)) {
     return { scope: "user" }
   }
-  if (basename(dirname(targetPath)) === ".omo" && (fileName === "omo.json" || fileName === "omo.jsonc")) {
+  if (basename(dirname(targetPath)) === ".omo" && isOmoConfigFileName(fileName)) {
     return { projectDir: dirname(dirname(targetPath)), scope: "project" }
   }
   throw new MigrationTransactionError(`Migration target is not an omo config path: ${targetPath}`)

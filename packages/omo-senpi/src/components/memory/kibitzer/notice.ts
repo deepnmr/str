@@ -115,9 +115,9 @@ export const renderKibitzerUnavailableEntry: EntryRenderer<unknown> = (entry, op
   const fixes = providers.length > 0
     ? [
       { text: `connect one of: ${providers.join(", ")} (run /login <provider>)`, tone: "dim" as const },
-      { text: `or pin categories.${category}.model (or memory.recall.category) in omo.json`, tone: "dim" as const },
+      { text: `or pin categories.${category}.model (or memory.recall.category) in str.json`, tone: "dim" as const },
     ]
-    : [{ text: `pin categories.${category}.model (or memory.recall.category) in omo.json to a connected model`, tone: "dim" as const }]
+    : [{ text: `pin categories.${category}.model (or memory.recall.category) in str.json to a connected model`, tone: "dim" as const }]
   return noticeComponent({
     glyph: "⚠",
     title: joinFields(["Kibitzer unavailable", category]),
@@ -180,7 +180,7 @@ export const renderKibitzerGateEntry: EntryRenderer<KibitzerGateRecord> = (entry
   // one-shot records do not, and keep the generic hint.
   const fix = category === undefined
     ? "check Kibitzer model/provider settings"
-    : `set categories.${category}.model (or memory.recall.category) in omo.json to a model that answers`
+    : `set categories.${category}.model (or memory.recall.category) in str.json to a model that answers`
   const extra = [
     ...(reason === undefined ? [] : [{ text: reason, tone: "dim" as const }]),
     ...(runId === undefined ? [] : [{ text: `run ${runId}`, tone: "dim" as const }]),

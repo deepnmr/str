@@ -343,7 +343,7 @@ export function openCodeRoutingGap(document, edition) {
 
 /** The one-line lead of the report, for `lines` from openCodeRoutingGap. */
 export function openCodeRoutingNotice(lines) {
-  return `OpenCode edition model settings Native does not use; run ${COMMAND} setup to carry them over, or set them in omo.jsonc: ${lines.join("; ")}`
+  return `OpenCode edition model settings Native does not use; run ${COMMAND} setup to carry them over, or set them in str.jsonc: ${lines.join("; ")}`
 }
 
 function isConfigured(document, section, name) {

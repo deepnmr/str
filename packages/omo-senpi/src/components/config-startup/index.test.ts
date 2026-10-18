@@ -130,7 +130,7 @@ describe("runSenpiStartupMigration", () => {
       "skipped",
       "skipped",
     ])
-    expect(parse(fileSystem.readFileSync("/home/alice/.omo/omo.jsonc", "utf-8"))).toMatchObject({
+    expect(parse(fileSystem.readFileSync("/home/alice/.omo/str.jsonc", "utf-8"))).toMatchObject({
       _migrations: [
         "2026-07-opencode-config-unification",
         "2026-07-codex-config-jsonc",
@@ -177,7 +177,7 @@ describe("runSenpiStartupMigration", () => {
     expect(opencodeResult.status).toBe("locked")
     expect(opencodeResult.results.filter((entry) => entry.status === "migrated")).toHaveLength(0)
     expect(senpiResult.results.filter((entry) => entry.status === "migrated")).toHaveLength(2)
-    expect(parse(fileSystem.readFileSync("/home/alice/.omo/omo.jsonc", "utf-8"))._migrations).toEqual([
+    expect(parse(fileSystem.readFileSync("/home/alice/.omo/str.jsonc", "utf-8"))._migrations).toEqual([
       "2026-07-opencode-config-unification",
       "2026-08-reasoning-unification",
     ])

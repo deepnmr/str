@@ -75,7 +75,7 @@ describe("writeOmoConfig", () => {
 
   it("#given no user config #when writing #then creates the user omo document", () => {
     const result = writeOmoConfig(installConfig)
-    const path = join(homeDirectory, ".omo", "omo.jsonc")
+    const path = join(homeDirectory, ".omo", "str.jsonc")
 
     expect(result).toEqual({ success: true, configPath: path })
     expect(record(parseJsonc<Record<string, unknown>>(readFileSync(path, "utf-8"))["[opencode]"])).not.toEqual({})

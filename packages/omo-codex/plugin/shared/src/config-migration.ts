@@ -2,6 +2,8 @@ import { existsSync } from "node:fs"
 import { posix, win32 } from "node:path"
 
 import {
+	DEFAULT_OMO_CONFIG_FILE_NAME,
+	OMO_CONFIG_FILE_NAMES,
 	runMigrations,
 	type LoadedMigrationSource,
 	type MigrationBoundary,
@@ -113,7 +115,8 @@ function migrationPlan(homeDir: string, options: CodexConfigMigrationOptions): M
 			backupPath: paths.join(backupRoot, path === configPath ? "config.jsonc" : "config.jsonc.migrations.json"),
 			path,
 		})),
-		targetPath: paths.join(homeDir, ".omo", "omo.jsonc"),
+		targetPath: OMO_CONFIG_FILE_NAMES.map((name) => paths.join(homeDir, ".omo", name)).find((path) => sourceExists(options, path))
+			?? paths.join(homeDir, ".omo", DEFAULT_OMO_CONFIG_FILE_NAME),
 		transform: (sources) => transformConfigJsonc(configPath, sources),
 	}
 }
