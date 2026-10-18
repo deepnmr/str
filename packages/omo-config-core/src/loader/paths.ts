@@ -29,6 +29,8 @@ export function resolveUserOmoConfigPath(env: OmoConfigEnv = process.env): strin
 }
 
 export function resolveUserOmoConfigDirectory(env: OmoConfigEnv = process.env): string {
+  const omoHomeDir = env.OMO_HOME_DIR?.trim()
+  if (omoHomeDir) return toPosixPath(resolve(omoHomeDir))
   return join(resolveHomeDir(env), ".omo")
 }
 

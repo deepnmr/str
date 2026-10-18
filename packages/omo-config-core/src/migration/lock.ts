@@ -1,6 +1,6 @@
 import { join } from "node:path"
 import { toPosixPath } from "../internal/posix-path"
-import { resolveHomeDir } from "../loader"
+import { resolveUserOmoConfigDirectory } from "../loader"
 import type { MigrationClock, MigrationEnvironment, MigrationFileSystem, MigrationProcess } from "./types"
 
 const DEFAULT_LEASE_DURATION_MS = 30_000
@@ -21,7 +21,7 @@ export type MigrationLock = {
 }
 
 export function migrationLockPath(env: MigrationEnvironment): string {
-  return toPosixPath(join(resolveHomeDir(env), ".omo", ".migration.lock"))
+  return toPosixPath(join(resolveUserOmoConfigDirectory(env), ".migration.lock"))
 }
 
 function mutationGuardPath(env: MigrationEnvironment): string {
@@ -120,7 +120,7 @@ export function acquireMigrationLock(input: {
 }): MigrationLock | null {
   const leaseDurationMs = input.leaseDurationMs ?? DEFAULT_LEASE_DURATION_MS
   const path = migrationLockPath(input.env)
-  input.fileSystem.mkdirSync(toPosixPath(join(resolveHomeDir(input.env), ".omo")), { recursive: true })
+  input.fileSystem.mkdirSync(toPosixPath(resolveUserOmoConfigDirectory(input.env)), { recursive: true })
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const currentContent = leaseContent(input.process, input.clock, leaseDurationMs)

@@ -1,8 +1,8 @@
-import { basename, dirname, join, resolve } from "node:path"
+import { basename, dirname, resolve } from "node:path"
 import { isPlainObject } from "../internal/plain-object"
 import { parseJsoncSafe } from "../internal/jsonc-parse"
 import { toPosixPath } from "../internal/posix-path"
-import { resolveHomeDir } from "../loader"
+import { resolveUserOmoConfigDirectory } from "../loader"
 import { OMO_CONFIG_HARNESS_IDS, OMO_CONFIG_LEGACY_HARNESS_IDS, OmoConfigSchema, harnessBlockKey } from "../schema"
 import { updateOmoConfig } from "../writer"
 import { diffEdits, withoutMarker } from "./diff-edits"
@@ -88,8 +88,7 @@ function validateTarget(targetPath: string, document: Readonly<Record<string, un
 }
 
 function writerInput(targetPath: string, env: MigrationEnvironment): { readonly projectDir?: string; readonly scope: "project" | "user" } {
-  const homeDir = resolveHomeDir(env)
-  const userDirectory = toPosixPath(join(homeDir, ".omo"))
+  const userDirectory = toPosixPath(resolveUserOmoConfigDirectory(env))
   const fileName = basename(targetPath)
   if (toPosixPath(dirname(targetPath)) === userDirectory && (fileName === "omo.json" || fileName === "omo.jsonc")) {
     return { scope: "user" }

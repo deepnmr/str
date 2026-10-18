@@ -81,6 +81,22 @@ describe("resolveUserOmoConfigPath", () => {
     // then
     expect(path).toBe(join(homeDir, ".omo", "omo.jsonc"))
   })
+
+  test("#given OMO_HOME_DIR is set #when resolving the user config path #then it replaces ~/.omo as the brand home", () => {
+    // when
+    const path = resolveUserOmoConfigPath({ HOME: "/h", OMO_HOME_DIR: "/x/.str" })
+
+    // then
+    expect(path).toBe(join("/x/.str", "omo.jsonc"))
+  })
+
+  test("#given OMO_HOME_DIR is blank #when resolving the user config path #then it falls back to ~/.omo", () => {
+    // when
+    const path = resolveUserOmoConfigPath({ HOME: "/h", OMO_HOME_DIR: "   " })
+
+    // then
+    expect(path).toBe(join("/h", ".omo", "omo.jsonc"))
+  })
 })
 
 describe("resolveOmoConfigPaths user candidate", () => {
