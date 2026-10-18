@@ -367,7 +367,7 @@ describe("createModelProfileComponent", () => {
     expect(pi.messages).toHaveLength(1)
     expect(pi.messages[0]?.message).toMatchObject({
       customType: MODEL_PROFILE_APPLIED_TYPE,
-      content: 'OmO Native: model profile "anthropic/claude-opus-5-5" selected anthropic/claude-opus-5-5; mid-session fallback follows senpi\'s retry chains',
+      content: 'str Native: model profile "anthropic/claude-opus-5-5" selected anthropic/claude-opus-5-5; mid-session fallback follows senpi\'s retry chains',
     })
   })
 
@@ -396,7 +396,7 @@ describe("createModelProfileComponent", () => {
     expect(pi.messages).toHaveLength(1)
     expect(pi.messages[0]?.message).toMatchObject({
       customType: MODEL_PROFILE_UNKNOWN_TYPE,
-      content: 'OmO Native: model_profile "turbo" is not defined; known profiles: daily-heavy, daily-normal, geeky-heavy, geeky-normal',
+      content: 'str Native: model_profile "turbo" is not defined; known profiles: daily-heavy, daily-normal, geeky-heavy, geeky-normal',
     })
   })
 

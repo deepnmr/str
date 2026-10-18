@@ -1,5 +1,6 @@
 import type { AuthFailure } from "./request-auth"
 import type { ModelProfileResolution, ModelProfileSummary } from "./resolve"
+import { NATIVE_BRAND_NAME } from "../native-badge/brand"
 
 const MID_SESSION_NOTE = "mid-session fallback follows senpi's retry chains"
 
@@ -50,16 +51,16 @@ export function noticeContent(
       const reasoning = resolution.reasoning !== undefined ? ` ${resolution.reasoning}` : ""
       const skipped = resolution.skipped.length > 0 ? ` (skipped: ${resolution.skipped.join(", ")})` : ""
       const auth = authFailures.length > 0 ? `; ${authFailureNote(authFailures, mode)}` : ""
-      return `OmO Native: model profile ${profileLabel(resolution.profile)} selected ${model}${reasoning}${skipped}${auth}; ${MID_SESSION_NOTE}`
+      return `${NATIVE_BRAND_NAME}: model profile ${profileLabel(resolution.profile)} selected ${model}${reasoning}${skipped}${auth}; ${MID_SESSION_NOTE}`
     }
     case "unavailable":
       if (authFailures.length > 0) {
-        return `OmO Native: model profile ${profileLabel(resolution.profile)} has no model whose credentials resolve; ${authFailureNote(authFailures, mode)}; keeping senpi's default model`
+        return `${NATIVE_BRAND_NAME}: model profile ${profileLabel(resolution.profile)} has no model whose credentials resolve; ${authFailureNote(authFailures, mode)}; keeping senpi's default model`
       }
-      return `OmO Native: model profile ${profileLabel(resolution.profile)} has no available model; none of the chain is in this session's model registry (${resolution.chain.join(", ")}); keeping senpi's default model`
+      return `${NATIVE_BRAND_NAME}: model profile ${profileLabel(resolution.profile)} has no available model; none of the chain is in this session's model registry (${resolution.chain.join(", ")}); keeping senpi's default model`
     case "empty":
-      return `OmO Native: model profile ${profileLabel(resolution.profile)} defines no models; keeping senpi's default model`
+      return `${NATIVE_BRAND_NAME}: model profile ${profileLabel(resolution.profile)} defines no models; keeping senpi's default model`
     case "unknown":
-      return `OmO Native: ${resolution.message}`
+      return `${NATIVE_BRAND_NAME}: ${resolution.message}`
   }
 }

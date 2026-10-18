@@ -6,6 +6,7 @@ import { newProbeState, resolveDefaultModelProfile, type ProbeState } from "./de
 import { authFailedDetails, noticeContent } from "./notice"
 import { type AuthFailure, type ProbeRegistry, probeRequestAuth, probeRuntime, sanitizedAuthErrorDetail } from "./request-auth"
 import { resolveModelProfile, type ModelProfileResolution } from "./resolve"
+import { NATIVE_BRAND_NAME } from "../native-badge/brand"
 
 /**
  * Applies the active `model_profile` to the MAIN session model at session start.
@@ -258,7 +259,7 @@ export function createModelProfileComponent(options: ModelProfileComponentOption
         }
 
         if (model === undefined) {
-          const message = `OmO Native: model profile "${resolution.profile.id}" resolved ${resolution.provider}/${resolution.modelId} but the registry no longer lists it`
+          const message = `${NATIVE_BRAND_NAME}: model profile "${resolution.profile.id}" resolved ${resolution.provider}/${resolution.modelId} but the registry no longer lists it`
           pi.sendMessage({ customType: MODEL_PROFILE_UNAVAILABLE_TYPE, content: message, display: true })
           ctx.logger.warn(message)
           return
