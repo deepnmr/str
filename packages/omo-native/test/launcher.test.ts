@@ -43,7 +43,7 @@ function createFixture(options: { hoisted?: boolean; scopedEngine?: boolean; shi
   const root = expandShortPath(realpathSync(mkdtempSync(join(tmpdir(), "omo-launcher-"))))
   roots.push(root)
   const packagePath = options.installLayout === "bun-legacy"
-    ? join(root, "home", "node_modules", "omo-ai")
+    ? join(root, "home", "node_modules", "@deepnmr", "str")
     : options.installLayout?.startsWith("bun")
     ? join(
       root,
@@ -53,18 +53,18 @@ function createFixture(options: { hoisted?: boolean; scopedEngine?: boolean; shi
       "install",
       "global",
       "node_modules",
-      "omo-ai",
+      "@deepnmr/str",
     )
     : options.installLayout === "npm"
-      ? join(root, "prefix", "lib", "node_modules", "omo-ai")
+      ? join(root, "prefix", "lib", "node_modules", "@deepnmr", "str")
       : options.hoisted
-        ? join(root, "node_modules", "omo-ai")
+        ? join(root, "node_modules", "@deepnmr", "str")
         : join(root, "app")
   mkdirSync(packagePath, { recursive: true })
   const packageRoot = expandShortPath(realpathSync(packagePath))
   cpSync(join(SOURCE_ROOT, "bin"), join(packageRoot, "bin"), { recursive: true })
   writeFile(join(packageRoot, "package.json"), JSON.stringify({
-    name: "omo-ai",
+    name: "@deepnmr/str",
     version: "1.2.3-test.0",
     type: "module",
     dependencies: { "@code-yeongyu/senpi": "2026.8.9" },
@@ -153,8 +153,8 @@ function runtimeInterpreter(runtime: "node" | "bun"): string | undefined {
 
 // The fixture is on 1.2.3-test.0 (beta channel); the stubbed registry publishes 1.2.3-test.1 on beta.
 const PUBLISHED_BETA = "1.2.3-test.1"
-const BUN_UPDATE_HINT = `omo is updated via bun: bun add -g omo-ai@${PUBLISHED_BETA}`
-const NPM_UPDATE_HINT = `omo is updated via npm: npm i -g omo-ai@${PUBLISHED_BETA}`
+const BUN_UPDATE_HINT = `str is updated via bun: bun add -g @deepnmr/str@${PUBLISHED_BETA}`
+const NPM_UPDATE_HINT = `str is updated via npm: npm i -g @deepnmr/str@${PUBLISHED_BETA}`
 
 /** Answers the dist-tags lookup from FAKE_DIST_TAGS (JSON), or as an unreachable registry when it is unset. */
 function stubRegistry(fixture: Fixture): void {
@@ -359,7 +359,7 @@ await runLauncher(["say", "hi"])
         expect(brand.update).toEqual({
           packageName: "@deepnmr/str",
           distTag: "beta",
-          command: "npm i -g omo-ai@beta",
+          command: "npm i -g @deepnmr/str@beta",
           changelogUrl: "https://github.com/deepnmr/str/releases",
         })
       })
@@ -488,7 +488,7 @@ await runLauncher(["say", "hi"])
           stubRegistry(fixture)
           const result = run(fixture, args, REGISTRY_ENV)
           expect(result.status).toBe(0)
-          expect(result.stdout).toContain(`npm i -g omo-ai@${PUBLISHED_BETA}`)
+          expect(result.stdout).toContain(`npm i -g @deepnmr/str@${PUBLISHED_BETA}`)
           expect(existsSync(fixture.captureFile)).toBe(false)
         })
       }
@@ -591,10 +591,10 @@ await runLauncher(["say", "hi"])
         const result = run(fixture, ["update"], { ...REGISTRY_ENV, FAKE_INSTALLS: PUBLISHED_BETA })
         expect(result.status).toBe(0)
         expect(result.stdout).toContain(NPM_UPDATE_HINT)
-        expect(result.stdout).toContain(`omo 1.2.3-test.0 -> ${PUBLISHED_BETA} (engine: senpi 2026.8.9)`)
+        expect(result.stdout).toContain(`str 1.2.3-test.0 -> ${PUBLISHED_BETA} (engine: senpi 2026.8.9)`)
         const spawned = JSON.parse(readFileSync(fixture.captureFile, "utf8"))
         expect(spawned.command).toBe("npm")
-        expect(spawned.args).toEqual(["i", "-g", `omo-ai@${PUBLISHED_BETA}`])
+        expect(spawned.args).toEqual(["i", "-g", `@deepnmr/str@${PUBLISHED_BETA}`])
       })
 
       test("#then a manager exit 0 that leaves the old version fails with the published version and retry command", () => {
@@ -603,8 +603,8 @@ await runLauncher(["say", "hi"])
         stubPackageManagerSpawn(fixture)
         const result = run(fixture, ["update"], REGISTRY_ENV)
         expect(result.status).toBe(1)
-        expect(result.stderr).toContain(`omo is still 1.2.3-test.0; ${PUBLISHED_BETA} is published`)
-        expect(result.stderr).toContain(`retry with: npm i -g omo-ai@${PUBLISHED_BETA}`)
+        expect(result.stderr).toContain(`str is still 1.2.3-test.0; ${PUBLISHED_BETA} is published`)
+        expect(result.stderr).toContain(`retry with: npm i -g @deepnmr/str@${PUBLISHED_BETA}`)
         expect(result.stdout).not.toContain(" -> ")
       })
 
@@ -614,7 +614,7 @@ await runLauncher(["say", "hi"])
         stubPackageManagerSpawn(fixture)
         const result = run(fixture, ["update"], { FAKE_DIST_TAGS: JSON.stringify({ beta: "1.2.3-test.0" }) })
         expect(result.status).toBe(0)
-        expect(result.stdout.trim()).toBe("omo 1.2.3-test.0 is up to date (omo-ai@beta is 1.2.3-test.0)")
+        expect(result.stdout.trim()).toBe("str 1.2.3-test.0 is up to date (@deepnmr/str@beta is 1.2.3-test.0)")
         expect(existsSync(fixture.captureFile)).toBe(false)
       })
 
@@ -623,8 +623,8 @@ await runLauncher(["say", "hi"])
         stubRegistry(fixture)
         const result = run(fixture, ["update", "--dry-run"])
         expect(result.status).toBe(0)
-        expect(result.stdout).toContain("could not confirm the beta omo-ai version")
-        expect(result.stdout).toContain("omo is updated via npm: npm i -g omo-ai@beta")
+        expect(result.stdout).toContain("could not confirm the beta @deepnmr/str version")
+        expect(result.stdout).toContain("str is updated via npm: npm i -g @deepnmr/str@beta")
       })
 
       test("#then executing a Bun-managed update overlays BUN_INSTALL and spawns bun add -g", () => {
@@ -634,11 +634,11 @@ await runLauncher(["say", "hi"])
         const result = run(fixture, ["update"], { ...REGISTRY_ENV, FAKE_INSTALLS: PUBLISHED_BETA, BUN_INSTALL: "/wrong" })
         expect(result.status).toBe(0)
         expect(result.stdout).toContain(BUN_UPDATE_HINT)
-        expect(result.stdout).toContain(`omo 1.2.3-test.0 -> ${PUBLISHED_BETA} (engine: senpi 2026.8.9)`)
+        expect(result.stdout).toContain(`str 1.2.3-test.0 -> ${PUBLISHED_BETA} (engine: senpi 2026.8.9)`)
         const spawned = JSON.parse(readFileSync(fixture.captureFile, "utf8"))
         expect(spawned.command).toBe("bun")
-        expect(spawned.args).toEqual(["add", "-g", `omo-ai@${PUBLISHED_BETA}`])
-        expect(spawned.env.BUN_INSTALL).toBe(fixture.packageRoot.replaceAll("\\", "/").replace(/\/install\/global\/node_modules\/omo-ai$/, ""))
+        expect(spawned.args).toEqual(["add", "-g", `@deepnmr/str@${PUBLISHED_BETA}`])
+        expect(spawned.env.BUN_INSTALL).toBe(fixture.packageRoot.replaceAll("\\", "/").replace(/\/install\/global\/node_modules\/@deepnmr\/str$/, ""))
       })
 
       test("#then a failing package-manager run exits non-zero with the manual command", () => {
@@ -648,7 +648,7 @@ await runLauncher(["say", "hi"])
         const result = run(fixture, ["update"], { ...REGISTRY_ENV, FAKE_EXIT: "7" })
         expect(result.status).toBe(7)
         expect(result.stdout).toContain(NPM_UPDATE_HINT)
-        expect(result.stderr).toContain(`retry with: npm i -g omo-ai@${PUBLISHED_BETA}`)
+        expect(result.stderr).toContain(`retry with: npm i -g @deepnmr/str@${PUBLISHED_BETA}`)
         expect(result.stdout).not.toContain(" -> ")
       })
     })
@@ -740,7 +740,7 @@ await runLauncher(["say", "hi"])
         rmSync(join(fixture.packageRoot, "node_modules", "@code-yeongyu", "senpi", "dist", "cli.js"))
         const result = run(fixture, ["say", "hi"])
         expect(result.status).toBe(1)
-        expect(result.stderr).toContain("reinstall with: npm i -g omo-ai@beta")
+        expect(result.stderr).toContain("reinstall with: npm i -g @deepnmr/str@beta")
       })
 
       test("#then a missing dependency fails with the same reinstall guidance", () => {
@@ -749,7 +749,7 @@ await runLauncher(["say", "hi"])
         const result = run(fixture, ["say", "hi"])
         expect(result.status).toBe(1)
         expect(result.stderr).toContain("could not resolve @code-yeongyu/senpi")
-        expect(result.stderr).toContain("reinstall with: npm i -g omo-ai@beta")
+        expect(result.stderr).toContain("reinstall with: npm i -g @deepnmr/str@beta")
       })
     })
   })

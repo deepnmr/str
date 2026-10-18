@@ -82,6 +82,7 @@ describe("omo doctor transient memory identities", () => {
       "plugin/runtime/agent-toolkit/cli.js",
     ]) writeFile(join(packageRoot, artifact))
 
+    // str pins its memory root under STR_HOME_DIR (else ~/.str), overriding an inherited OMO_MEMORY_HOME.
     const memoryHome = join(root, "memory")
     writeFile(join(memoryHome, "agents", "durable-1", "repo", "system", "persona.md"))
     writeFile(join(memoryHome, "agents", "transient-1", "runtime", "locks", ".keep"))
@@ -93,7 +94,7 @@ describe("omo doctor transient memory identities", () => {
       env: {
         ...process.env,
         SENPI_CODING_AGENT_DIR: join(root, "agent"),
-        OMO_MEMORY_HOME: memoryHome,
+        STR_HOME_DIR: root,
       },
     })
 

@@ -2,6 +2,8 @@ import { closeSync, lstatSync, openSync, readFileSync, readSync, realpathSync, s
 import { homedir } from "node:os"
 import { delimiter, dirname, isAbsolute, join, win32 } from "node:path"
 import { parseJsonc } from "./jsonc.js"
+import { brandHome } from "./agent-dir.js"
+import { COMMAND, PACKAGE_NAME } from "./brand.js"
 import { releaseChannel } from "./package-paths.js"
 import { opencodeConfigSources } from "./setup-opencode-assets.js"
 import { openCodeRoutingGap, openCodeRoutingNotice, readEditionRouting } from "./setup-opencode-models.js"
@@ -12,7 +14,7 @@ import { standaloneBinaryVersion } from "./standalone-binary.js"
 // registered. The owner rules mirror packages/omo-opencode/src/cli/install-native/legacy-omo-bin.ts,
 // which this package cannot import.
 
-const NATIVE_PACKAGE = "omo-ai"
+const NATIVE_PACKAGE = PACKAGE_NAME
 const LEGACY_PACKAGES = ["oh-my-openagent", "oh-my-opencode"]
 // The native installer repairs an `omo` owned by any of these, so the fix it names works for them.
 const REPAIRABLE_BIN_OWNERS = [...LEGACY_PACKAGES, "lazycodex"]
@@ -71,7 +73,7 @@ export function scanOmoBins(environment) {
   for (const directory of environment.pathDirectories) {
     if (seen.has(directory)) continue
     seen.add(directory)
-    const binPath = suffixes.map((suffix) => join(directory, `omo${suffix}`)).find(pathExists)
+    const binPath = suffixes.map((suffix) => join(directory, `${COMMAND}${suffix}`)).find(pathExists)
     if (binPath === undefined) continue
     const owner = resolveOwner(binPath)
     const kind = classify(owner)
@@ -289,21 +291,21 @@ function shellQuote(value) {
 function omoInstallRemoval(entry, bunRoot) {
   if (entry.kind === "standalone") return `rm -f -- ${shellQuote(entry.binPath)}`
   const real = realPathOf(entry.binPath)
-  if (real.startsWith(realPathOf(bunRoot))) return `BUN_INSTALL=${shellQuote(bunRoot)} bun remove -g omo-ai`
-  const packageMarker = /[\\/]lib[\\/]node_modules[\\/]omo-ai[\\/]/.exec(real)
+  if (real.startsWith(realPathOf(bunRoot))) return `BUN_INSTALL=${shellQuote(bunRoot)} bun remove -g ${PACKAGE_NAME}`
+  const packageMarker = /[\\/]lib[\\/]node_modules[\\/]@deepnmr[\\/]str[\\/]/.exec(real)
   const prefix = packageMarker === null ? dirname(entry.directory) : real.slice(0, packageMarker.index)
-  return `npm uninstall -g omo-ai --prefix ${shellQuote(prefix)}`
+  return `npm uninstall -g ${PACKAGE_NAME} --prefix ${shellQuote(prefix)}`
 }
 
 export function formatMigrationLines({ shadowing, nativeDirectory, legacyPackages, registrations, restoreCommand, omoInstalls = [], bunRoot = "", standalone = false }) {
   const lines = []
   const first = omoInstalls[0]
-  const target = first?.kind === "standalone" || (first === undefined && standalone) ? "the standalone omo binary" : "omo-ai"
+  const target = first?.kind === "standalone" || (first === undefined && standalone) ? "the standalone omo binary" : PACKAGE_NAME
   for (const entry of shadowing) {
-    const fix = entry.kind === "legacy" && target === "omo-ai"
+    const fix = entry.kind === "legacy" && target === PACKAGE_NAME
       ? `${repairCommand()} (repairs it), or remove that file.`
       : nativeDirectory === null
-        ? `remove that file, or put ${target === "omo-ai" ? "omo-ai's bin dir" : "the omo binary's directory"} ahead of it on PATH.`
+        ? `remove that file, or put ${target === PACKAGE_NAME ? `${PACKAGE_NAME}'s bin dir` : "the omo binary's directory"} ahead of it on PATH.`
         : `remove that file, or move ${nativeDirectory} ahead of ${entry.directory} on PATH.`
     lines.push(`WARN another omo precedes ${target} on PATH: ${entry.binPath} (${ownerLabel(entry.owner)}). Fix: ${fix}`)
   }
@@ -333,7 +335,7 @@ export function formatMigrationLines({ shadowing, nativeDirectory, legacyPackage
 // The OpenCode edition's model settings Native does not use: the same line Native's first start
 // prints (omo-senpi config-startup), for as long as the gap exists.
 export function openCodeRoutingReport({ env, homeDir }) {
-  const path = ["omo.jsonc", "omo.json"].map((name) => join(homeDir, ".omo", name)).find((candidate) => readWholeFile(candidate) !== undefined)
+  const path = ["omo.jsonc", "omo.json"].map((name) => join(brandHome(env, homeDir), name)).find((candidate) => readWholeFile(candidate) !== undefined)
   let document = {}
   if (path !== undefined) {
     try {

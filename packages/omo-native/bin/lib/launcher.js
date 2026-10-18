@@ -12,8 +12,9 @@ import { isHostStatusAll, runHostStatusAll, sessionActivityReader } from "./host
 import { runDoctor } from "./doctor.js"
 import { ensureEnginePrepared, preparePluginLaunchSpec } from "./engine-prepare.js"
 import { migrateLegacyBunGlobalManifest } from "./legacy-bun-global-migration.js"
-import { adoptLegacyFlatState, canonicalAgentDir, runtimeHome } from "./agent-dir.js"
+import { adoptLegacyFlatState, canonicalAgentDir } from "./agent-dir.js"
 import { BRAND_NAME, COMMAND, ENV_PREFIX, HOME_DIRNAME, PACKAGE_NAME, REPOSITORY_URL } from "./brand.js"
+import { pinStrHome } from "./str-home.js"
 import { nearestNodeBin, packageManifest, packageRoot, readJson, releaseBanner, releaseChannel, resolveSenpi, updateTarget } from "./package-paths.js"
 import { runSelfUpdate } from "./self-update.js"
 import { isSelfUpdate } from "./update-args.js"
@@ -108,13 +109,7 @@ function senpiEnvironment(senpiRoot) {
   env.STR_CODING_AGENT_DIR = agentDir
   env.OMO_CODING_AGENT_DIR = agentDir
   env.SENPI_CODING_AGENT_DIR = agentDir
-  const homeDir = env.STR_HOME_DIR?.trim() || join(runtimeHome(env), HOME_DIRNAME)
-  env.OMO_HOME_DIR = homeDir
-  env.OMO_MEMORY_HOME = join(homeDir, "memory")
-  env.OMO_LSP_DAEMON_DIR = join(homeDir, "lsp-daemon")
-  // An inherited RPC endpoint belongs to an omo daemon; attaching to it would run str sessions
-  // inside another product's host.
-  for (const name of ["OMO_RPC_SOCKET", "OMO_RPC_SHARD_ROOT", "SENPI_RPC_SOCKET", "PI_RPC_SOCKET"]) delete env[name]
+  pinStrHome(env)
   // senpi's footer reads this marker to show the OmO Native badge for omo-ai installs, which load
   // the plugin via --extension and therefore never match the settings-packages detection gates.
   env.OMO_NATIVE = "1"

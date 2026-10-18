@@ -4,7 +4,7 @@ import { join } from "node:path"
 
 /**
  * Where `omo daemon` reads its config. Its `task.*` keys (`host_engine_policy`, `host_idle_exit_ms`) come
- * from the omo-config-core loader (~/.omo/omo.jsonc or ~/.omo/omo.json plus project `.omo` layers, JSONC,
+ * from the omo-config-core loader (~/.str/omo.jsonc or ~/.str/omo.json plus project `.omo` layers, JSONC,
  * the precedence every other `task.*` key has), reached through the staged
  * `plugin/runtime/task-config/index.js` bundle (task-config-entry.ts). `<agentDir>/omo.json` is the
  * deprecated source: it still supplies a key when the loader finds none for it.
@@ -78,8 +78,8 @@ function migrationAdvice({ key, value }) {
   if (key === "host_engine_policy" && value === "never") {
     return '"never" is a command-line policy only (the config key accepts upgrade|fallback); pass --no-upgrade instead'
   }
-  if (key === "host_idle_exit_ms" && !Number.isInteger(value)) return "move it to ~/.omo/omo.jsonc as whole milliseconds"
-  return "move it to ~/.omo/omo.jsonc"
+  if (key === "host_idle_exit_ms" && !Number.isInteger(value)) return "move it to ~/.str/omo.jsonc as whole milliseconds"
+  return "move it to ~/.str/omo.jsonc"
 }
 
 /** One doctor line per key the deprecated file supplied; none when the loader supplies them or cannot run. */

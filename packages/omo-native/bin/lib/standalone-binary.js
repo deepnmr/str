@@ -1,14 +1,15 @@
 import { closeSync, openSync, readdirSync, readSync, realpathSync, statSync } from "node:fs"
 import { join } from "node:path"
+import { brandHome } from "./agent-dir.js"
 
 const SAMPLE_BYTES = 64 * 1024
 
-// A compiled omo copies itself to ~/.omo/binary-runtime/<version>/omo on its first run
+// A compiled str copies itself to ~/.str/binary-runtime/<version>/omo on its first run
 // (materializeProvisionedExecutable in compile-runtime.ts), so a standalone binary that has run
 // once is that file or a byte-identical copy of it. Copies are compared by size and a bounded
 // head+tail sample: these binaries are ~100 MB and the doctor must stay fast.
 export function standaloneBinaryVersion(binPath, homeDir, isWindows) {
-  const root = join(homeDir, ".omo", "binary-runtime")
+  const root = join(brandHome(process.env, homeDir), "binary-runtime")
   let versions
   try {
     versions = readdirSync(root)

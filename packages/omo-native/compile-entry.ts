@@ -15,7 +15,7 @@ import { handOffToProvisionedRuntime, planProvisionedLaunch } from "./provisione
 import { parseBuildInfo, parseEngineBuildStamp, versionLines } from "./build-info"
 import { compiledUpdate, fetchGitHubReleases, probePackageOwner, releaseAssetName, RELEASES_URL } from "./compiled-update"
 import { migrateLegacyBunGlobalManifest } from "./bin/lib/legacy-bun-global-migration.js"
-import { adoptLegacyFlatState, canonicalAgentDir } from "./bin/lib/agent-dir.js"
+import { adoptLegacyFlatState, brandHome, canonicalAgentDir } from "./bin/lib/agent-dir.js"
 import { readJson, releaseBanner } from "./bin/lib/package-paths.js"
 import { remapSenpiEnvironment } from "./compiled-environment"
 import { runServiceAuthCommand, SERVICE_ACCOUNTS_OPEN } from "../omo-opencode/src/cli/service-auth/commands"
@@ -295,7 +295,7 @@ async function main(): Promise<void> {
   if (!manifestFile) throw new Error("embedded runtime-manifest.json is missing")
   const manifest = JSON.parse(await embeddedText(manifestFile)) as EmbeddedManifest
   const runningExecutable = runningExecutablePath()
-  const expected = join(homedir(), ".omo", "binary-runtime", manifest.omoAiVersion, process.platform === "win32" ? "omo.exe" : "omo")
+  const expected = join(brandHome(process.env, homedir()), "binary-runtime", manifest.omoAiVersion, process.platform === "win32" ? "omo.exe" : "omo")
   const launch = planProvisionedLaunch(runningExecutable, expected)
   // Materialize the provisioned runtime BEFORE answering the informational fast-path.
   // First-run provisioning must happen even for `--version`/`-v`: the release smoke test

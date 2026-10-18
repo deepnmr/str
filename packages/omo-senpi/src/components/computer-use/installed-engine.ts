@@ -1,6 +1,6 @@
 import { accessSync, constants, existsSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import { join, resolve } from "node:path"
 import {
   desktopEngineReleaseAssetName,
   findCachedDesktopEngine,
@@ -84,7 +84,7 @@ export function resolveInstalledEngine(
   if (located.diagnostic.code === "quarantined") return { diagnostic: located.diagnostic }
   if (version !== undefined) {
     const cached = findCachedDesktopEngine({
-      host, version, cacheDir: join(env.HOME ?? homedir(), ".omo", "cache", "senpi-desktop-engine"),
+      host, version, cacheDir: join(env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(env.HOME ?? homedir(), ".omo"), "cache", "senpi-desktop-engine"),
     })
     if (cached.path !== null) return { path: cached.path, source: "cache" }
   }

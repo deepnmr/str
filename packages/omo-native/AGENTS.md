@@ -2,12 +2,12 @@
 
 **Role:** Adapter - distribution package for the senpi-based omo native edition.
 
-Publishes npm package `omo-ai` (bin `omo`) on the channel its version names: a prerelease on `beta`, a stable release on `latest`. The launcher in `bin/` runs the
+Publishes npm package `@deepnmr/str` (bin `str`; the str fork of upstream `omo-ai`) on the channel its version names: a prerelease on `beta`, a stable release on `latest`. The launcher in `bin/` runs the
 exact-pinned `@code-yeongyu/senpi` CLI with `--extension <pkgRoot>/plugin`, where `plugin/` is the staged
 omo-senpi plugin payload produced by `bun run build:omo-native` (gitignored, never committed).
 
-- `bin/omo.js` - launcher entry (dispatch, doctor, setup, senpi passthrough)
-- brand: the launcher injects a `SENPI_BRAND` profile (name, `~/.omo/agent` home, `OMO_*` env prefix, wire identity, omo-ai update channel of the running version) so the pinned engine presents as omo; `--version` and every self-update spelling are answered by the launcher. See `docs/reference/omo-ai-publishing.md`.
+- `bin/str.js` - launcher entry (dispatch, doctor, setup, senpi passthrough)
+- brand: the launcher injects a `SENPI_BRAND` profile (from `bin/lib/brand.js`: name `str`, `~/.str/agent` home, `STR_*` env prefix, wire identity, `@deepnmr/str` update channel of the running version) so the pinned engine presents as str; the launcher also forces `OMO_HOME_DIR=~/.str` (override: `STR_HOME_DIR`) so every per-user path stays out of an installed omo's `~/.omo`; `--version` and every self-update spelling are answered by the launcher. See `docs/reference/omo-ai-publishing.md`.
 - `bin/lib/` - launcher modules:
   - `launcher.js` — `runLauncher()` dispatch, senpi environment/brand/update routing
   - `agent-dir.js` — `canonicalAgentDir()`, `adoptLegacyFlatState()`, legacy flat-dir migration
@@ -49,7 +49,7 @@ omo-senpi plugin payload produced by `bun run build:omo-native` (gitignored, nev
   - `config-doctor.js` - doctor's `WARN config: <file>: <key> ignored (...)` lines, one per key the omo.json loader dropped and one per file it did not load, from `configDoctorLines` (`config-doctor-runtime.ts`) through the same staged runtime bundle; the compiled entry imports it directly. A runtime that cannot load prints `WARN config: diagnostics unavailable: <reason>`.
   - `gateway.js` - the hook for a separately installed chat-surface gateway: `omo gateway ...` and the doctor gateway rows import `@oh-my-opencode/omo-gateway/host` by name from omo's own install, lazily (only for `omo gateway`, or for doctor when the user config has a `gateway` section), check its `HOST_CONTRACT_VERSION`, and hand it argv, stdio, env, cwd, the agent dir, home, the relaunch argv, `pluginRoot` (`<packageRoot>/plugin`) and `threadSdkUrl` (the `file:` URL of `<pluginRoot>/runtime/thread-sdk/sdk.js`; the doctor call gets the last two as well). omo ships no gateway code; the package validates its own section, and omo-config-core keeps only a permissive `gateway` key.
   - `package-paths.js`, `provider-map.json`, `legacy-bun-global-migration.js`
-- **agent state lives in ONE canonical directory: `~/.omo/agent`.** `bin/lib/agent-dir.js` owns that answer (`canonicalAgentDir`), and the launcher, `omo doctor`, `omo setup` and the locally installed launcher (`packages/omo-senpi/src/install/local-launcher.ts`) all resolve it from there - never by composing their own default. An explicit `OMO_CODING_AGENT_DIR` (or legacy `SENPI_CODING_AGENT_DIR` / `PI_CODING_AGENT_DIR`) still wins, and `adoptLegacyFlatState` carries state left in the pre-unification flat `~/.omo` layout forward once, so unifying the location never reads as another reset.
+- **agent state lives in ONE canonical directory: `~/.str/agent`.** `bin/lib/agent-dir.js` owns that answer (`canonicalAgentDir`), and the launcher, `omo doctor`, `omo setup` and the locally installed launcher (`packages/omo-senpi/src/install/local-launcher.ts`) all resolve it from there - never by composing their own default. An explicit `STR_CODING_AGENT_DIR` still wins (inherited `OMO_`/`SENPI_`/`PI_CODING_AGENT_DIR` belong to other installs and are ignored), and `adoptLegacyFlatState` carries state left in the pre-unification flat `~/.omo` layout forward once, so unifying the location never reads as another reset.
 - `bin/omo-agent-toolkit.js` - internal delegate to the staged toolkit runtime, NOT an npm bin
 - `test/` - package-contract and launcher tests; `pty-signal-qa.py` is the real-surface QA harness
   (boots the real chain on a pty whose session leader outlives the launcher, SIGTERMs the launcher,
@@ -68,8 +68,8 @@ omo-senpi plugin payload produced by `bun run build:omo-native` (gitignored, nev
 bun run build:omo-native                 # stage plugin payload (repo root)
 bun test packages/omo-native/test        # package tests (repo root)
 bunx tsc -p packages/omo-native/tsconfig.json --noEmit
-node packages/omo-native/bin/omo.js --version   # entry smoke check
-python3 packages/omo-native/test/pty-signal-qa.py packages/omo-native/bin/omo.js /tmp/qa.txt   # launcher signal QA (bun chain wherever bun is installed; OMO_RUNTIME=node for the node chain)
+node packages/omo-native/bin/str.js --version   # entry smoke check
+python3 packages/omo-native/test/pty-signal-qa.py packages/omo-native/bin/str.js /tmp/qa.txt   # launcher signal QA (bun chain wherever bun is installed; OMO_RUNTIME=node for the node chain)
 ```
 
 Release mechanics and the beta-channel contract: `docs/reference/omo-ai-publishing.md`.

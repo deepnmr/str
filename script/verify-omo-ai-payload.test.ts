@@ -23,7 +23,7 @@ const guardTimeoutMs = 120_000
 setDefaultTimeout(guardTimeoutMs)
 
 const PACKED_ARTIFACTS = [
-  "bin/omo.js",
+  "bin/str.js",
   "plugin/package.json",
   "plugin/CHANGELOG.md",
   "plugin/extensions/omo.js",

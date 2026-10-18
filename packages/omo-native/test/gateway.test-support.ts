@@ -42,15 +42,15 @@ export function write(root: string, path: string, content: string): void {
 
 export function home(userConfig?: string): { HOME: string } {
   const root = tempRoot("omo-gateway-hook-home-")
-  mkdirSync(join(root, ".omo"), { recursive: true })
-  if (userConfig !== undefined) writeFileSync(join(root, ".omo", "omo.jsonc"), userConfig)
+  mkdirSync(join(root, ".str"), { recursive: true })
+  if (userConfig !== undefined) writeFileSync(join(root, ".str", "omo.jsonc"), userConfig)
   return { HOME: root }
 }
 
 export function packagedOmo(gatewayHostSource?: string, manifest: Record<string, unknown> = GATEWAY_MANIFEST): string {
   const app = tempRoot("omo-gateway-hook-app-")
   cpSync(join(SOURCE_ROOT, "bin"), join(app, "bin"), { recursive: true })
-  write(app, "package.json", JSON.stringify({ name: "omo-ai", version: "1.2.3-test.0", type: "module" }))
+  write(app, "package.json", JSON.stringify({ name: "@deepnmr/str", version: "1.2.3-test.0", type: "module" }))
   write(app, "drive.mjs", [
     'import { runGatewayCommand } from "./bin/lib/gateway.js"',
     "process.exitCode = await runGatewayCommand(process.argv.slice(2), { launch: ['omo-under-test', 'gateway', 'connect'] })",

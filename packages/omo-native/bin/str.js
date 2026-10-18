@@ -4,8 +4,13 @@ import { ensureBunBinShim } from "./lib/bun-bin-shim.js"
 import { maybeReexecUnderBun } from "./lib/bun-runtime.js"
 import { runLauncher } from "./lib/launcher.js"
 import { runSetup } from "./lib/setup-import.js"
+import { pinStrHome } from "./lib/str-home.js"
 
 try {
+  // `setup`, `doctor`, `gateway` and the other in-process subcommands read omo-config-core, memory
+  // and lsp-daemon paths before any engine is spawned, so the str home is pinned for this process
+  // first; otherwise they would read and write an installed omo's ~/.omo.
+  pinStrHome()
   // A machine that has bun runs omo on bun, whichever package manager installed it. A `bun add -g`
   // install is reached through a symlink in ~/.bun/bin, and node resolves the main module to its
   // real path, so this URL already points inside the bun global tree. Every bun is held to the

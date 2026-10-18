@@ -46,7 +46,7 @@ function opencodeUser(): Sandbox {
   })
   write(join(opencodeDir, "skills", "release-notes", "SKILL.md"), "---\nname: release-notes\ndescription: notes\n---\nbody\n")
   write(join(opencodeDir, "skills", "broken", "README.md"), "not a skill\n")
-  return { home, agentDir: join(home, ".str", "agent"), omoConfig: join(home, ".omo", "omo.jsonc") }
+  return { home, agentDir: join(home, ".str", "agent"), omoConfig: join(home, ".str", "omo.jsonc") }
 }
 
 function env(item: Sandbox): NodeJS.ProcessEnv {
@@ -116,7 +116,7 @@ describe("omo setup migration summary", () => {
       const stdout = run(item, ["--dry-run", "--yes"])
 
       // then
-      expect(existsSync(join(item.home, ".omo"))).toBe(false)
+      expect(existsSync(join(item.home, ".str"))).toBe(false)
       expect(occurrences(stdout, PLAN_PROMPT)).toBe(0)
       expect(occurrences(stdout, NOT_IMPORTED)).toBe(0)
       expect(occurrences(stdout, TELEMETRY_ENV)).toBe(1)
@@ -138,7 +138,7 @@ describe("omo setup migration summary", () => {
       expect(occurrences(whole, NOT_IMPORTED)).toBe(1)
       expect(occurrences(each, NOT_IMPORTED)).toBe(3)
       expect(each).toContain("model choice not carried: default model acme/acme-large")
-      expect(existsSync(join(item.home, ".omo"))).toBe(false)
+      expect(existsSync(join(item.home, ".str"))).toBe(false)
     })
 
     test("#when setup runs again after importing #then there is nothing to consent to and no file changes", () => {

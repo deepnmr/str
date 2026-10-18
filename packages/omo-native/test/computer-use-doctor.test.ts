@@ -198,7 +198,7 @@ describe("computer use doctor probe", () => {
     const engine = fakeEngine(home)
     const bytes = readFileSync(engine.path)
     const digest = createHash("sha256").update(bytes).digest("hex")
-    const generation = join(home, ".omo", "cache", "senpi-desktop-engine", "5.1.4", "darwin-arm64", `${digest}-${randomUUID()}`)
+    const generation = join(home, ".str", "cache", "senpi-desktop-engine", "5.1.4", "darwin-arm64", `${digest}-${randomUUID()}`)
     mkdirSync(generation, { recursive: true })
     const cached = join(generation, "senpi-desktop-engine-darwin-arm64")
     writeFileSync(cached, bytes)
@@ -214,7 +214,7 @@ describe("computer use doctor probe", () => {
     let report: ComputerUseDoctorReport
     try {
       report = await computerUseDoctorReport({
-        cwd: home, env: { HOME: home, OMO_TEST_REQUEST_LOG: engine.log },
+        cwd: home, env: { HOME: home, OMO_HOME_DIR: join(home, ".str"), OMO_TEST_REQUEST_LOG: engine.log },
         version: "5.1.4", packageRoot: join(home, "package"),
         platform: "darwin", arch: "arm64", launchEngine: (path, args, env) => {
           launchedPaths.push(path)
@@ -227,13 +227,13 @@ describe("computer use doctor probe", () => {
     }
     expect(report.kind).toBe("ready")
     expect(report).toMatchObject({ enginePath: cached, engineSource: "cache" })
-    const stable = join(home, ".omo", "engines", "senpi-desktop-engine", "darwin-arm64", "senpi-desktop-engine")
+    const stable = join(home, ".str", "engines", "senpi-desktop-engine", "darwin-arm64", "senpi-desktop-engine")
     expect(launchedPaths).toEqual([stable])
     expect(report).toMatchObject({ launchedEnginePath: stable })
     const stamped = join(home, "stamped")
     mkdirSync(stamped)
     writeFileSync(join(stamped, "package.json"), JSON.stringify({ name: "omo", version: "5.1.4" }))
-    expect(describeEngineSource(undefined, { HOME: home, OMO_PACKAGE_DIR: stamped }, {
+    expect(describeEngineSource(undefined, { HOME: home, OMO_HOME_DIR: join(home, ".str"), OMO_PACKAGE_DIR: stamped }, {
       platform: "darwin", arch: "arm64", execDir: join(home, "bin"),
       packageDir: join(home, "engine-package"), repoRoot: home,
     })).toBe(`found ${cached} (cache, omo v5.1.4)`)

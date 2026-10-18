@@ -16,6 +16,7 @@
  * A key either file already has, in the harness block or the shared base, is never overwritten.
  */
 
+import { brandHome } from "./agent-dir.js"
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, realpathSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { isDeepStrictEqual } from "node:util"
@@ -44,8 +45,8 @@ function readTarget(path) {
 // The file omo-config-core's loader reads as the user layer (loader/paths.ts): omo.jsonc, else
 // omo.json; a new file is omo.jsonc.
 function omoTargetPath(home) {
-  const jsonc = join(home, ".omo", "omo.jsonc")
-  const json = join(home, ".omo", "omo.json")
+  const jsonc = join(brandHome({}, home), "omo.jsonc")
+  const json = join(brandHome({}, home), "omo.json")
   return existsSync(jsonc) || !existsSync(json) ? jsonc : json
 }
 

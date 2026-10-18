@@ -34,6 +34,11 @@ export function runtimeHome(env = process.env) {
   return env.HOME || env.USERPROFILE || homedir()
 }
 
+/** Per-user str home: OMO_HOME_DIR when set, otherwise <home>/.str. */
+export function brandHome(env = process.env, home = runtimeHome(env)) {
+  return env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(home, HOME_DIRNAME)
+}
+
 /** Where omo keeps engine state: an explicit override, otherwise the canonical branded location. */
 export function canonicalAgentDir(env = process.env, home = runtimeHome(env)) {
   for (const name of AGENT_DIR_ENV_NAMES) {

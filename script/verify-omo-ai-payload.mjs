@@ -12,7 +12,7 @@ const repoRoot = resolve(scriptDir, "..")
 const pkgDir = resolve(repoRoot, "packages", "omo-native")
 
 const REQUIRED_ARTIFACTS = [
-  "bin/omo.js",
+  "bin/str.js",
   "plugin/package.json",
   "plugin/CHANGELOG.md",
   "plugin/extensions/omo.js",

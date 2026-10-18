@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { accessSync, chmodSync, constants, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import {
 	type DesktopEngineLocateDiagnostic,
 	type DesktopEngineLocatorOptions,
@@ -12,6 +12,12 @@ import {
 import { parseDesktopEngineChecksums } from "./checksums";
 import { DESKTOP_ENGINE_CHECKSUMS_ASSET, desktopEngineReleaseAssetName } from "./release-assets";
 import { isDesktopEngineRelease } from "./release-signature";
+
+/** The per-user brand home: OMO_HOME_DIR when a distribution pins one (str does), else ~/.omo. */
+function brandHomeDir(): string {
+	const pinned = process.env.OMO_HOME_DIR?.trim();
+	return pinned ? resolve(pinned) : join(homedir(), ".omo");
+}
 
 const RELEASE_BASE = "https://github.com/code-yeongyu/oh-my-openagent/releases/download";
 const MUSL_SUFFIX = "-musl";
@@ -45,7 +51,7 @@ export function findCachedDesktopEngine(
 	let attemptedPaths: readonly string[] = [];
 	if (asset === null) return { path: null, attemptedPaths };
 	const platform = host.slice(0, host.indexOf("-"));
-	const cacheRoot = options.cacheDir ?? join(homedir(), ".omo", "cache", "senpi-desktop-engine");
+	const cacheRoot = options.cacheDir ?? join(brandHomeDir(), "cache", "senpi-desktop-engine");
 	const hostDir = join(cacheRoot, version, host);
 	if (existsSync(hostDir)) {
 		for (const entry of readdirSync(hostDir)) {
@@ -119,7 +125,7 @@ export async function acquireDesktopEngine(options: AcquireDesktopEngineOptions)
 		if (!/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$/.test(version)) {
 			return unavailable(`Invalid omo release version: ${version}`);
 		}
-		const cacheRoot = options.cacheDir ?? join(homedir(), ".omo", "cache", "senpi-desktop-engine");
+		const cacheRoot = options.cacheDir ?? join(brandHomeDir(), "cache", "senpi-desktop-engine");
 		const hostDir = join(cacheRoot, version, host);
 		const cached = findCachedDesktopEngine(options, (path) => {
 			attemptedPaths = [...attemptedPaths, path];
@@ -179,7 +185,7 @@ export async function launchDesktopEngine<T>(
 		path: source.path,
 		sha256: source.sha256,
 		version: options.version,
-		directory: join(options.installDir ?? join(homedir(), ".omo", "engines", "senpi-desktop-engine"), options.host),
+		directory: join(options.installDir ?? join(brandHomeDir(), "engines", "senpi-desktop-engine"), options.host),
 	}, (path) => {
 		if (isQuarantinedFile(path)) {
 			return {

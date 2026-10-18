@@ -11,6 +11,7 @@
 
 import { existsSync, readdirSync } from "node:fs"
 import { isAbsolute, join, relative, resolve } from "node:path"
+import { brandHome } from "./agent-dir.js"
 import providerMap from "./provider-map.json" with { type: "json" }
 import { opencodeConfigSources, readOpencodeConfig } from "./setup-opencode-assets.js"
 
@@ -58,7 +59,7 @@ function record(value) {
 function editionFile(path, home, notices) {
   if (existsSync(path)) return path
   const inHome = relative(home, path)
-  const root = join(home, ".omo")
+  const root = brandHome({}, home)
   if (inHome.startsWith("..") || isAbsolute(inHome) || !existsSync(root)) return path
   const moved = readdirSync(root)
     .filter((name) => /^migration-backup-.+-opencode-config$/.test(name))

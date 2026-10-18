@@ -112,14 +112,16 @@ export async function computerUseDoctorReport(input: ComputerUseDoctorInput): Pr
     input.launchEngine,
   ) })
   const home = input.env.HOME ?? homedir()
+  // Same rule as installed-engine.ts: the pinned OMO_HOME_DIR (str always sets one), else ~/.omo.
+  const brandHome = input.env.OMO_HOME_DIR?.trim() ? resolve(input.env.OMO_HOME_DIR) : join(home, ".omo")
   const launched = settings.enginePath !== undefined && "path" in resolved
     ? { path: resolved.path, value: probe(resolved.path) }
     : await launchDesktopEngine({
       version: input.version,
       host,
       allowDownload: false,
-      cacheDir: join(home, ".omo", "cache", "senpi-desktop-engine"),
-      installDir: join(home, ".omo", "engines", "senpi-desktop-engine"),
+      cacheDir: join(brandHome, "cache", "senpi-desktop-engine"),
+      installDir: join(brandHome, "engines", "senpi-desktop-engine"),
       locatorOptions,
     }, probe)
   if (launched.path === null) {

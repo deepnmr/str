@@ -29,7 +29,7 @@ function sandbox(): Sandbox {
     home,
     agentDir: join(home, ".str", "agent"),
     opencodeDir: join(home, ".config", "opencode"),
-    omoConfig: join(home, ".omo", "omo.jsonc"),
+    omoConfig: join(home, ".str", "omo.jsonc"),
     settings: join(home, ".str", "agent", "settings.json"),
   }
 }
@@ -51,7 +51,8 @@ function run(item: Sandbox, args: string[]) {
 }
 
 function nativeView(item: Sandbox, harness: "native" | "opencode" = "native") {
-  return loadOmoConfig({ cwd: item.home, env: { HOME: item.home }, harness, platform: "linux" })
+  // str sessions see OMO_HOME_DIR=~/.str (pinned by the launcher), so the loader is read the same way.
+  return loadOmoConfig({ cwd: item.home, env: { HOME: item.home, OMO_HOME_DIR: join(item.home, ".str") }, harness, platform: "linux" })
 }
 
 function readJson(path: string): Record<string, unknown> {
@@ -115,7 +116,7 @@ describe("omo setup model choices", () => {
 
       // then
       expect([readFileSync(item.omoConfig, "utf8"), readFileSync(item.settings, "utf8")]).toEqual(before)
-      expect(readdirSync(join(item.home, ".omo")).filter((name) => name.includes(".bak-"))).toEqual([])
+      expect(readdirSync(join(item.home, ".str")).filter((name) => name.includes(".bak-"))).toEqual([])
       expect(stdout).toContain("model-choices-carried: none")
     })
   })
@@ -160,8 +161,8 @@ describe("omo setup model choices", () => {
       expect(loaded.config.categories?.["deep-low"]?.models?.[0]).toBe("kimi-coding/k3")
       expect(loaded.config.telemetry?.enabled).toBe(false)
       expect(readJson(item.settings)).toEqual({ defaultProvider: "anthropic", defaultModel: "claude-opus-5-5" })
-      expect(readdirSync(join(item.home, ".omo")).filter((name) => name.startsWith("omo.jsonc.bak-"))).toHaveLength(1)
-      expect(readFileSync(join(item.home, ".omo", readdirSync(join(item.home, ".omo")).find((name) => name.startsWith("omo.jsonc.bak-"))!), "utf8")).toBe(original)
+      expect(readdirSync(join(item.home, ".str")).filter((name) => name.startsWith("omo.jsonc.bak-"))).toHaveLength(1)
+      expect(readFileSync(join(item.home, ".str", readdirSync(join(item.home, ".str")).find((name) => name.startsWith("omo.jsonc.bak-"))!), "utf8")).toBe(original)
       expect(stdout).toContain("model-choices-skipped-existing: default model, category quick")
     })
   })
@@ -244,7 +245,7 @@ describe("omo setup model choices", () => {
       // given
       const item = sandbox()
       write(item.omoConfig, { "[opencode]": { categories: { quick: { model: "opencode-go/glm-5.2" } } } })
-      write(join(item.home, ".omo", "migration-backup-2026-09-24T00-00-00-000Z-opencode-config", ".config", "opencode", "oh-my-openagent.json"), {
+      write(join(item.home, ".str", "migration-backup-2026-09-24T00-00-00-000Z-opencode-config", ".config", "opencode", "oh-my-openagent.json"), {
         categories: { quick: { model: "zai-coding-plan/glm-5.2" }, writing: { model: "kimi-for-coding/k3" } },
       })
 
