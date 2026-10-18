@@ -63,7 +63,9 @@ function packedPaths() {
     stdio: ["ignore", "pipe", "inherit"],
     ...npmSpawnOptions(),
   })
-  const [result] = JSON.parse(raw)
+  // npm <= 11 prints an array of results; npm 12 prints an object keyed by package name.
+  const parsed = JSON.parse(raw)
+  const [result] = Array.isArray(parsed) ? parsed : Object.values(parsed)
   if (!result) return { paths: [], unpackedSize: 0 }
   return {
     paths: result.files.map((file) => file.path),
