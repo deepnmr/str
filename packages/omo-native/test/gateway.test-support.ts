@@ -66,7 +66,7 @@ export function drive(app: string, args: string[], env: { HOME: string }): { sta
   const result = spawnSync(process.execPath, [join(app, "drive.mjs"), ...args], {
     cwd: app,
     encoding: "utf8",
-    env: { PATH: process.env.PATH ?? "", HOME: env.HOME, OMO_CODING_AGENT_DIR: join(env.HOME, ".omo", "agent") },
+    env: { PATH: process.env.PATH ?? "", HOME: env.HOME, STR_CODING_AGENT_DIR: join(env.HOME, ".str", "agent") },
   })
   return { status: result.status, stdout: result.stdout, stderr: result.stderr }
 }

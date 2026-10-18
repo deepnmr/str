@@ -8,7 +8,7 @@ import {
   reapStaleEngines,
 } from "../bin/lib/doctor.js"
 
-const LAUNCHER = join(resolve(fileURLToPath(new URL("..", import.meta.url))), "bin", "omo.js")
+const LAUNCHER = join(resolve(fileURLToPath(new URL("..", import.meta.url))), "bin", "str.js")
 
 type Entry = {
   pid: number

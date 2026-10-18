@@ -55,7 +55,7 @@ function createFixture(installLayout: InstallLayout = "npm"): Fixture {
   for (const [, artifact] of artifacts) writeFile(join(packageRoot, artifact))
   const agentDir = join(root, "agent")
   mkdirSync(agentDir, { recursive: true })
-  return { root, packageRoot, launcher: join(packageRoot, "bin", "omo.js"), agentDir }
+  return { root, packageRoot, launcher: join(packageRoot, "bin", "str.js"), agentDir }
 }
 
 function run(fixture: Fixture, env: NodeJS.ProcessEnv = {}) {

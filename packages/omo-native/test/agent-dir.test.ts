@@ -35,37 +35,39 @@ afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true })
 })
 
-describe("omo agent directory", () => {
+describe("str agent directory", () => {
   describe("#given no explicit override", () => {
     describe("#when the agent directory is resolved", () => {
       test("#then it is the canonical branded location", () => {
         const home = createHome()
-        expect(canonicalAgentDir({}, home)).toBe(join(home, ".omo", "agent"))
+        expect(canonicalAgentDir({}, home)).toBe(join(home, ".str", "agent"))
       })
     })
   })
 
   describe("#given an explicit override", () => {
     describe("#when the agent directory is resolved", () => {
-      test("#then the brand-prefixed name wins over the legacy names", () => {
+      test("#then the str-prefixed name wins over every inherited name", () => {
         const home = createHome()
         const env = {
-          OMO_CODING_AGENT_DIR: join(home, "brand"),
+          STR_CODING_AGENT_DIR: join(home, "brand"),
+          OMO_CODING_AGENT_DIR: join(home, "omo"),
           SENPI_CODING_AGENT_DIR: join(home, "legacy"),
           PI_CODING_AGENT_DIR: join(home, "ancient"),
         }
         expect(canonicalAgentDir(env, home)).toBe(join(home, "brand"))
       })
 
-      test("#then each legacy name is honored in order", () => {
+      test("#then inherited omo, senpi and pi names are ignored so str never resolves into another install", () => {
         const home = createHome()
-        expect(canonicalAgentDir({ SENPI_CODING_AGENT_DIR: join(home, "legacy") }, home)).toBe(join(home, "legacy"))
-        expect(canonicalAgentDir({ PI_CODING_AGENT_DIR: join(home, "ancient") }, home)).toBe(join(home, "ancient"))
+        expect(canonicalAgentDir({ OMO_CODING_AGENT_DIR: join(home, ".omo", "agent") }, home)).toBe(join(home, ".str", "agent"))
+        expect(canonicalAgentDir({ SENPI_CODING_AGENT_DIR: join(home, "legacy") }, home)).toBe(join(home, ".str", "agent"))
+        expect(canonicalAgentDir({ PI_CODING_AGENT_DIR: join(home, "ancient") }, home)).toBe(join(home, ".str", "agent"))
       })
 
       test("#then a blank value falls back to the canonical location", () => {
         const home = createHome()
-        expect(canonicalAgentDir({ OMO_CODING_AGENT_DIR: "   " }, home)).toBe(join(home, ".omo", "agent"))
+        expect(canonicalAgentDir({ STR_CODING_AGENT_DIR: "   " }, home)).toBe(join(home, ".str", "agent"))
       })
     })
   })
@@ -82,6 +84,8 @@ describe("omo agent directory", () => {
         const result = adoptLegacyFlatState({}, home)
 
         const canonical = canonicalAgentDir({}, home)
+        expect(legacyFlatAgentDir(home)).toBe(join(home, ".str"))
+        expect(canonical).toBe(join(home, ".str", "agent"))
         expect(result.adopted).toBe(true)
         expect(result.copied.sort()).toEqual(["auth.json", "settings.json"])
         expect(readJson(join(canonical, "settings.json"))).toEqual(JSON.parse(FLAT_SETTINGS))
@@ -131,10 +135,18 @@ describe("omo agent directory", () => {
         write(join(legacyFlatAgentDir(home), "settings.json"), FLAT_SETTINGS)
         const override = join(home, "elsewhere")
 
-        const result = adoptLegacyFlatState({ OMO_CODING_AGENT_DIR: override }, home)
+        const result = adoptLegacyFlatState({ STR_CODING_AGENT_DIR: override }, home)
 
         expect(result.adopted).toBe(false)
         expect(existsSync(override)).toBe(false)
+      })
+
+      test("#then flat state left in ~/.omo is never adopted into str", () => {
+        const home = createHome()
+        write(join(home, ".omo", "settings.json"), FLAT_SETTINGS)
+        const result = adoptLegacyFlatState({}, home)
+        expect(result.adopted).toBe(false)
+        expect(existsSync(join(home, ".str", "agent", "settings.json"))).toBe(false)
       })
 
       test("#then a home without legacy state stays empty", () => {

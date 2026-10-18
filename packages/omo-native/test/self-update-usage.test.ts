@@ -153,7 +153,7 @@ export async function runChild(command, args) {
   return { status: 0, signal: null }
 }
 `)
-  return { root, launcher: join(packageRoot, "bin", "omo.js"), captureFile: join(root, "capture.json") }
+  return { root, launcher: join(packageRoot, "bin", "str.js"), captureFile: join(root, "capture.json") }
 }
 
 function launch(fixture: ReturnType<typeof launcherFixture>, args: string[]) {

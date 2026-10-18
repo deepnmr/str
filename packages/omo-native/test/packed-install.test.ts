@@ -24,7 +24,7 @@ describe("omo-ai packed install", () => {
       writeFileSync(join(consumer, "package.json"), JSON.stringify({ name: "omo-ai-consumer", private: true }))
       const install = Bun.spawnSync(["bun", "add", "--trust", join(root, tarball!)], { cwd: consumer, stdout: "pipe", stderr: "pipe" })
       expect(install.exitCode).toBe(0)
-      const installedPackageRoot = join(consumer, "node_modules", "omo-ai")
+      const installedPackageRoot = join(consumer, "node_modules", "@deepnmr", "str")
       const installedFloor = join(installedPackageRoot, "bin", "lib", "claude-code-floor.js")
       expect(readFileSync(installedFloor, "utf8")).toContain("claudeCodeVersionFloor")
 
@@ -64,7 +64,7 @@ describe("omo-ai packed install", () => {
       writeFileSync(join(consumer, "package.json"), JSON.stringify({ name: "omo-ai-consumer", private: true }))
       const install = Bun.spawnSync(["bun", "add", "--ignore-scripts", "--backend", "copyfile", join(root, tarball!)], { cwd: consumer, stdout: "pipe", stderr: "pipe" })
       expect(install.exitCode).toBe(0)
-      const installedPackageRoot = join(consumer, "node_modules", "omo-ai")
+      const installedPackageRoot = join(consumer, "node_modules", "@deepnmr", "str")
       const consumerRequire = createRequire(join(installedPackageRoot, "package.json"))
       const searchPaths = consumerRequire.resolve.paths("@code-yeongyu/senpi") ?? []
       const senpiRoot = searchPaths.map((searchPath) => join(searchPath, "@code-yeongyu", "senpi")).find((candidate) => existsSync(join(candidate, "package.json")))
@@ -74,9 +74,9 @@ describe("omo-ai packed install", () => {
       // The stamp is the precondition: a hardlinked Bun cache can already carry a rewritten rpc-mode.js.
       expect(existsSync(stamp)).toBe(false)
 
-      const launch = Bun.spawnSync(["node", join(installedPackageRoot, "bin", "omo.js"), "--help"], {
+      const launch = Bun.spawnSync(["node", join(installedPackageRoot, "bin", "str.js"), "--help"], {
         cwd: consumer,
-        env: { ...process.env, HOME: home, USERPROFILE: home, OMO_RUNTIME: "node", OMO_CODING_AGENT_DIR: join(home, ".omo", "agent") },
+        env: { ...process.env, HOME: home, USERPROFILE: home, OMO_RUNTIME: "node", STR_CODING_AGENT_DIR: join(home, ".str", "agent") },
         stdout: "pipe",
         stderr: "pipe",
       })

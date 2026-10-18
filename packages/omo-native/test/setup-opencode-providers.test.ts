@@ -38,7 +38,7 @@ function fixture(): Fixture {
     configHome: join(root, "config"),
     dataHome: join(root, "data"),
     tmp: join(root, "tmp"),
-    launcher: join(app, "bin", "omo.js"),
+    launcher: join(app, "bin", "str.js"),
   }
 }
 
@@ -61,7 +61,7 @@ function childEnv(item: Fixture): NodeJS.ProcessEnv {
     BUN_TMPDIR: item.tmp,
     HOME: item.home,
     USERPROFILE: item.home,
-    SENPI_CODING_AGENT_DIR: item.agentDir,
+    STR_CODING_AGENT_DIR: item.agentDir,
     XDG_CONFIG_HOME: item.configHome,
     XDG_DATA_HOME: item.dataHome,
   }

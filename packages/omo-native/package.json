@@ -1,10 +1,10 @@
 {
-  "name": "omo-ai",
+  "name": "@deepnmr/str",
   "version": "5.1.35",
   "type": "module",
-  "description": "OmO Native - the standalone omo command with the OMO extension built in: bun add -g omo-ai",
+  "description": "str - the standalone str command with the OMO extension built in: bun add -g @deepnmr/str",
   "bin": {
-    "omo": "bin/omo.js"
+    "str": "bin/str.js"
   },
   "files": [
     "bin",
@@ -21,6 +21,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/code-yeongyu/oh-my-openagent.git"
+    "url": "git+https://github.com/deepnmr/str.git"
   }
 }

@@ -1,0 +1,6 @@
+export const BRAND_NAME = "str"
+export const COMMAND = "str"
+export const PACKAGE_NAME = "@deepnmr/str"
+export const HOME_DIRNAME = ".str"
+export const ENV_PREFIX = "STR"
+export const REPOSITORY_URL = "https://github.com/deepnmr/str"

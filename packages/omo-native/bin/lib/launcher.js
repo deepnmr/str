@@ -12,7 +12,8 @@ import { isHostStatusAll, runHostStatusAll, sessionActivityReader } from "./host
 import { runDoctor } from "./doctor.js"
 import { ensureEnginePrepared, preparePluginLaunchSpec } from "./engine-prepare.js"
 import { migrateLegacyBunGlobalManifest } from "./legacy-bun-global-migration.js"
-import { adoptLegacyFlatState, canonicalAgentDir } from "./agent-dir.js"
+import { adoptLegacyFlatState, canonicalAgentDir, runtimeHome } from "./agent-dir.js"
+import { BRAND_NAME, COMMAND, ENV_PREFIX, HOME_DIRNAME, PACKAGE_NAME, REPOSITORY_URL } from "./brand.js"
 import { nearestNodeBin, packageManifest, packageRoot, readJson, releaseBanner, releaseChannel, resolveSenpi, updateTarget } from "./package-paths.js"
 import { runSelfUpdate } from "./self-update.js"
 import { isSelfUpdate } from "./update-args.js"
@@ -43,22 +44,22 @@ function brandProfile() {
   // startup notes, never fail the launch.
   const changelog = pluginChangelogSource()
   return {
-    name: "OmO",
-    command: "omo",
+    name: BRAND_NAME,
+    command: COMMAND,
     displayVersion: packageManifest().version,
-    configDir: ".omo",
-    // Engine state lives at the canonical `~/.omo/agent`, never directly under the config
-    // directory: a flat home would disagree with the directory every omo surface resolves.
+    configDir: HOME_DIRNAME,
+    // Engine state lives at the canonical `~/.str/agent`, never directly under the config
+    // directory: a flat home would disagree with the directory every str surface resolves.
     flatLayout: false,
-    envPrefix: "OMO",
-    userAgent: "omo",
-    originator: "omo",
+    envPrefix: ENV_PREFIX,
+    userAgent: COMMAND,
+    originator: COMMAND,
     ...(changelog ? { changelog } : {}),
     update: {
-      packageName: "omo-ai",
+      packageName: PACKAGE_NAME,
       distTag: releaseChannel(),
       command: update.command,
-      changelogUrl: "https://github.com/code-yeongyu/oh-my-openagent/releases",
+      changelogUrl: `${REPOSITORY_URL}/releases`,
     },
   }
 }
@@ -100,11 +101,20 @@ function senpiEnvironment(senpiRoot) {
   delete env.OMO_BIN
   delete env.SENPI_BIN
   dropForeignPackageDirs(env, senpiRoot)
-  // One directory for every surface. The legacy name travels too, so a bare senpi spawned by a
-  // tool inherits the same state instead of falling back to its own home.
+  // One directory for every surface. The engine reads its own prefix plus the legacy SENPI_/PI_
+  // names, and the plugin reads OMO_*, so every name is forced to str's directory: an inherited
+  // omo value must never pull str back into `~/.omo`.
   const agentDir = canonicalAgentDir(env)
+  env.STR_CODING_AGENT_DIR = agentDir
   env.OMO_CODING_AGENT_DIR = agentDir
   env.SENPI_CODING_AGENT_DIR = agentDir
+  const homeDir = env.STR_HOME_DIR?.trim() || join(runtimeHome(env), HOME_DIRNAME)
+  env.OMO_HOME_DIR = homeDir
+  env.OMO_MEMORY_HOME = join(homeDir, "memory")
+  env.OMO_LSP_DAEMON_DIR = join(homeDir, "lsp-daemon")
+  // An inherited RPC endpoint belongs to an omo daemon; attaching to it would run str sessions
+  // inside another product's host.
+  for (const name of ["OMO_RPC_SOCKET", "OMO_RPC_SHARD_ROOT", "SENPI_RPC_SOCKET", "PI_RPC_SOCKET"]) delete env[name]
   // senpi's footer reads this marker to show the OmO Native badge for omo-ai installs, which load
   // the plugin via --extension and therefore never match the settings-packages detection gates.
   env.OMO_NATIVE = "1"
@@ -123,7 +133,9 @@ function senpiEnvironment(senpiRoot) {
   }
   // Anything resolving the product by name must re-enter through this launcher, otherwise it
   // would reach the engine directly and lose the brand.
-  env.OMO_BIN = join(packageRoot, "bin", "omo.js")
+  const launcher = join(packageRoot, "bin", "str.js")
+  env.OMO_BIN = launcher
+  env.STR_BIN = launcher
   return env
 }
 
@@ -174,12 +186,12 @@ function reportLegacyFlatAdoption() {
   try {
     result = adoptLegacyFlatState()
   } catch (error) {
-    console.error(`omo: could not adopt legacy state: ${error.message}`)
+    console.error(`${COMMAND}: could not adopt legacy state: ${error.message}`)
     return
   }
   if (!result.adopted) return
   const moved = [...result.copied, ...result.backfilled].join(", ")
-  notice(`omo: carried forward settings from the legacy ~/.omo layout (${moved})`)
+  notice(`${COMMAND}: carried forward settings from the legacy ~/${HOME_DIRNAME} layout (${moved})`)
 }
 
 /**
@@ -300,7 +312,7 @@ export async function runLauncher(args = process.argv.slice(2)) {
     return
   }
   if ((command === "--version" || command === "-v") && args.length === 1) {
-    console.log(`omo ${packageManifest().version} (engine: senpi ${engineVersion()})`)
+    console.log(`${COMMAND} ${packageManifest().version} (engine: senpi ${engineVersion()})`)
     process.exitCode = 0
     return
   }

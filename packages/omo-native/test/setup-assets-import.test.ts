@@ -31,7 +31,7 @@ function fixture(): Fixture {
     home: join(root, "home"),
     agentDir: join(root, "senpi-agent"),
     configHome: join(root, "config"),
-    launcher: join(app, "bin", "omo.js"),
+    launcher: join(app, "bin", "str.js"),
   }
 }
 
@@ -48,7 +48,7 @@ function run(item: Fixture, args: string[]) {
     ...process.env,
     HOME: item.home,
     USERPROFILE: item.home,
-    SENPI_CODING_AGENT_DIR: item.agentDir,
+    STR_CODING_AGENT_DIR: item.agentDir,
     XDG_CONFIG_HOME: item.configHome,
     XDG_DATA_HOME: join(item.home, "unused-data"),
   }

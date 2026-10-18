@@ -68,13 +68,13 @@ process.exit(0)
     "plugin/package.json", "plugin/extensions/omo.js", "plugin/runtime/lsp-daemon/dist/cli.js",
     "plugin/runtime/agent-toolkit/cli.js",
   ]) write(join(packageRoot, artifact), "fixture\n")
-  const env = { HOME: home, SENPI_CODING_AGENT_DIR: agentDir, XDG_DATA_HOME: xdg }
+  const env = { HOME: home, STR_CODING_AGENT_DIR: agentDir, XDG_DATA_HOME: xdg }
   return {
     root,
     home,
     agentDir,
     xdg,
-    launcher: join(packageRoot, "bin", "omo.js"),
+    launcher: join(packageRoot, "bin", "str.js"),
     captureFile: join(root, "capture.txt"),
     cachePath: join(agentDir, CACHE_FILENAME),
     env,
@@ -86,6 +86,7 @@ function runLauncher(fixture: Fixture, args: string[], tty = false) {
   // would outrank the fixture's SENPI_* override and answer with real machine state.
   // launcher.test.ts defends the same way.
   const inherited: NodeJS.ProcessEnv = { ...process.env, CAPTURE_FILE: fixture.captureFile }
+  delete inherited.STR_CODING_AGENT_DIR
   delete inherited.OMO_CODING_AGENT_DIR
   delete inherited.PI_CODING_AGENT_DIR
   const env = { ...inherited, ...fixture.env }

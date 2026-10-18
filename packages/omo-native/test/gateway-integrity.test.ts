@@ -84,7 +84,7 @@ describe("omo verifies the installed gateway package before importing its host e
     expect(result.status).toBe(7)
     expect(JSON.parse(result.stdout)).toEqual({
       args: ["connect"],
-      agentDir: join(env.HOME, ".omo", "agent"),
+      agentDir: join(env.HOME, ".str", "agent"),
       home: env.HOME,
       pluginRoot: join(app, "plugin"),
       threadSdkUrl: pathToFileURL(join(app, "plugin", "runtime", "thread-sdk", "sdk.js")).href,

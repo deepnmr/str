@@ -47,7 +47,7 @@ process.exit(0)
   const home = join(root, "home")
   mkdirSync(home, { recursive: true })
   return {
-    launcher: join(packageRoot, "bin", "omo.js"),
+    launcher: join(packageRoot, "bin", "str.js"),
     captureFile: join(root, "capture.txt"),
     env: { HOME: home, SENPI_CODING_AGENT_DIR: join(root, "senpi-agent"), XDG_DATA_HOME: join(root, "xdg") },
   }

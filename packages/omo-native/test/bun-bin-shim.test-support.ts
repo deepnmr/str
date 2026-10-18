@@ -36,7 +36,7 @@ export function existsOnly(...present: string[]): (path: string) => boolean {
 }
 
 export function bunTreePackage(bunRoot: string): string {
-  return join(bunRoot, "install", "global", "node_modules", "omo-ai", "bin", "omo.js")
+  return join(bunRoot, "install", "global", "node_modules", "omo-ai", "bin", "str.js")
 }
 
 /** The second bin a bun-global install exposes: the one PATH usually reaches first. */
@@ -46,7 +46,7 @@ export function nodeModulesBinPath(bunRoot: string): string {
 
 /** The stock shape bun links: a relative symlink from <root>/bin/omo into the global tree. */
 export function stockLinkTarget(): string {
-  return join("..", "install", "global", "node_modules", "omo-ai", "bin", "omo.js")
+  return join("..", "install", "global", "node_modules", "omo-ai", "bin", "str.js")
 }
 
 /** Drives the unit surface with recorded filesystem operations, so no assertion touches the host. */

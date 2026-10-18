@@ -17,7 +17,7 @@ import { runStatus as runProductionStatus } from "../bin/lib/daemon-operations.j
 import { resolveSenpi } from "../bin/lib/package-paths.js"
 
 const PACKAGE_ROOT = resolve(import.meta.dir, "..")
-const LAUNCHER = join(PACKAGE_ROOT, "bin", "omo.js")
+const LAUNCHER = join(PACKAGE_ROOT, "bin", "str.js")
 // The tracked source of the launch spec; `build:omo-native` copies it into this package's untracked plugin/.
 const LAUNCH_SPEC = resolve(PACKAGE_ROOT, "..", "omo-senpi", "plugin", "daemon-launch-spec.json")
 const roots: string[] = []
@@ -46,6 +46,7 @@ function sandbox() {
     TEMP: agentDir,
     TMP: agentDir,
     OMO_RUNTIME: "node",
+    STR_CODING_AGENT_DIR: agentDir,
     OMO_CODING_AGENT_DIR: agentDir,
     SENPI_CODING_AGENT_DIR: agentDir,
     PI_CODING_AGENT_DIR: agentDir,

@@ -59,6 +59,7 @@ function fixtureEnv(fixture: Fixture, env: Record<string, string> = {}): NodeJS.
   }
   delete inherited.OMO_RUNTIME
   delete inherited.OMO_DEBUG
+  delete inherited.STR_CODING_AGENT_DIR
   delete inherited.OMO_CODING_AGENT_DIR
   delete inherited.SENPI_CODING_AGENT_DIR
   delete inherited.PI_CODING_AGENT_DIR
@@ -108,7 +109,7 @@ process.exit(Number(process.env.FAKE_EXIT ?? 0))
     root,
     bunInstall,
     packageRoot,
-    launcher: join(packageRoot, "bin", "omo.js"),
+    launcher: join(packageRoot, "bin", "str.js"),
     binPath: join(bunInstall, "bin", "omo"),
     bunBinary,
     captureFile,
@@ -464,7 +465,7 @@ describe("bun launcher bin shim", () => {
       const again = launchEntry(fixture, ["--version"], { OMO_RUNTIME: "node" })
       // then: it answered from the node path and left the shim untouched
       expect(again.status).toBe(0)
-      expect(again.stdout.trim()).toBe("omo 9.9.9-test.0 (engine: senpi 2026.8.9)")
+      expect(again.stdout.trim()).toBe("str 9.9.9-test.0 (engine: senpi 2026.8.9)")
       expect(statSync(fixture.binPath).mode & 0o777).toBe(0o644)
     })
 

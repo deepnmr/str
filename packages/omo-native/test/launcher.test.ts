@@ -113,13 +113,15 @@ writeFileSync(process.env.CAPTURE_FILE, JSON.stringify({ argv: process.argv.slic
 process.exit(Number(process.env.FAKE_EXIT ?? 0))
 `)
   const captureFile = join(root, "capture.json")
-  return { root, packageRoot, launcher: join(packageRoot, "bin", "omo.js"), captureFile, shimPath }
+  return { root, packageRoot, launcher: join(packageRoot, "bin", "str.js"), captureFile, shimPath }
 }
 
 function run(fixture: Fixture, args: string[], env: NodeJS.ProcessEnv = {}) {
   // A developer machine exports the agent directory for its own install; inheriting it would let
   // the override path answer assertions that are about the unconfigured default.
   const inherited: NodeJS.ProcessEnv = { ...process.env, PATH: "/usr/bin:/bin", CAPTURE_FILE: fixture.captureFile }
+  delete inherited.STR_CODING_AGENT_DIR
+  delete inherited.STR_HOME_DIR
   delete inherited.OMO_CODING_AGENT_DIR
   delete inherited.SENPI_CODING_AGENT_DIR
   delete inherited.PI_CODING_AGENT_DIR
@@ -207,7 +209,7 @@ await runLauncher(["say", "hi", "-e", "/user/plugin"])
       // when
       const result = spawnSync(process.execPath, [probe], {
         encoding: "utf8",
-        env: { ...process.env, EXEC_CAPTURE: execCapture, CAPTURE_FILE: fixture.captureFile, OMO_CODING_AGENT_DIR: join(fixture.root, "agent") },
+        env: { ...process.env, EXEC_CAPTURE: execCapture, CAPTURE_FILE: fixture.captureFile, STR_CODING_AGENT_DIR: join(fixture.root, "agent") },
       })
       // then: the fake engine writes captureFile only if the spawn path ran.
       expect(result.status).toBe(0)
@@ -219,6 +221,7 @@ await runLauncher(["say", "hi", "-e", "/user/plugin"])
         process.execPath, join(fixture.packageRoot, "node_modules", "@code-yeongyu", "senpi", "dist", "cli.js"),
         "--extension", join(fixture.packageRoot, "plugin"), "say", "hi", "-e", "/user/plugin",
       ])
+      expect(handed.env.STR_CODING_AGENT_DIR).toBe(join(fixture.root, "agent"))
       expect(handed.env.OMO_CODING_AGENT_DIR).toBe(join(fixture.root, "agent"))
       expect(handed.env.SENPI_CODING_AGENT_DIR).toBe(join(fixture.root, "agent"))
       expect(handed.env.OMO_NATIVE).toBe("1")
@@ -240,7 +243,7 @@ await runLauncher(["say", "hi"])
         // when
         const result = spawnSync(process.execPath, [probe], {
           encoding: "utf8",
-          env: { ...process.env, CAPTURE_FILE: fixture.captureFile, FAKE_EXIT: "37", OMO_CODING_AGENT_DIR: join(fixture.root, "agent") },
+          env: { ...process.env, CAPTURE_FILE: fixture.captureFile, FAKE_EXIT: "37", STR_CODING_AGENT_DIR: join(fixture.root, "agent") },
         })
         // then
         expect(result.status).toBe(37)
@@ -279,14 +282,15 @@ await runLauncher(["say", "hi"])
         // The Native payload no longer ships a toolkit CLI, so the launcher must not point the env
         // at its own package; an unrelated inherited value from the parent process may still ride along.
         expect(environment.OMO_AGENT_TOOLKIT_BIN ?? "").not.toContain(fixture.packageRoot)
-        expect(environment.OMO_CODING_AGENT_DIR).toBe(join(home, ".omo", "agent"))
-        expect(environment.SENPI_CODING_AGENT_DIR).toBe(join(home, ".omo", "agent"))
+        expect(environment.STR_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
+        expect(environment.OMO_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
+        expect(environment.SENPI_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
         // An inherited value must never survive; it is replaced by this launcher's own entry so
         // anything resolving the product by name re-enters here instead of the bare engine.
         // Windows reports this path in its long form while the fixture root may be the 8.3 short
         // form, so the contract is asserted by target rather than by exact spelling.
         expect(existsSync(environment.OMO_BIN ?? "")).toBe(true)
-        expect((environment.OMO_BIN ?? "").replace(/\\/g, "/")).toMatch(/\/bin\/omo\.js$/)
+        expect((environment.OMO_BIN ?? "").replace(/\\/g, "/")).toMatch(/\/bin\/str\.js$/)
         expect(environment.OMO_BIN).not.toBe(environment.SENPI_BIN)
       })
 
@@ -344,19 +348,19 @@ await runLauncher(["say", "hi"])
         expect(result.status).toBe(0)
 
         const brand = JSON.parse(capture(fixture).env.SENPI_BRAND ?? "{}")
-        expect(brand.name).toBe("OmO")
-        expect(brand.command).toBe("omo")
-        expect(brand.configDir).toBe(".omo")
+        expect(brand.name).toBe("str")
+        expect(brand.command).toBe("str")
+        expect(brand.configDir).toBe(".str")
         expect(brand.flatLayout).toBe(false)
-        expect(brand.envPrefix).toBe("OMO")
-        expect(brand.userAgent).toBe("omo")
-        expect(brand.originator).toBe("omo")
+        expect(brand.envPrefix).toBe("STR")
+        expect(brand.userAgent).toBe("str")
+        expect(brand.originator).toBe("str")
         expect(brand.displayVersion).toBe("1.2.3-test.0")
         expect(brand.update).toEqual({
-          packageName: "omo-ai",
+          packageName: "@deepnmr/str",
           distTag: "beta",
           command: "npm i -g omo-ai@beta",
-          changelogUrl: "https://github.com/code-yeongyu/oh-my-openagent/releases",
+          changelogUrl: "https://github.com/deepnmr/str/releases",
         })
       })
 
@@ -393,7 +397,70 @@ await runLauncher(["say", "hi"])
         expect(result.status).toBe(0)
         const omoBin = capture(fixture).env.OMO_BIN ?? ""
         expect(existsSync(omoBin)).toBe(true)
-        expect(omoBin.replace(/\\/g, "/")).toMatch(/\/bin\/omo\.js$/)
+        expect(omoBin.replace(/\\/g, "/")).toMatch(/\/bin\/str\.js$/)
+        expect(capture(fixture).env.STR_BIN).toBe(omoBin)
+      })
+    })
+
+    describe("#when the parent process belongs to an omo install", () => {
+      test("#then inherited omo agent dirs are overridden with str's own ~/.str/agent", () => {
+        const fixture = createFixture()
+        const home = join(fixture.root, "home")
+        const result = run(fixture, ["say", "hi"], {
+          HOME: home,
+          OMO_CODING_AGENT_DIR: "/x/.omo/agent",
+          SENPI_CODING_AGENT_DIR: "/x/.omo/agent",
+          PI_CODING_AGENT_DIR: "/x/.pi/agent",
+        })
+        expect(result.status).toBe(0)
+        const environment = capture(fixture).env
+        expect((environment.OMO_CODING_AGENT_DIR ?? "").replace(/\\/g, "/")).toEndWith("/.str/agent")
+        expect(environment.OMO_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
+        expect(environment.SENPI_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
+        expect(environment.STR_CODING_AGENT_DIR).toBe(join(home, ".str", "agent"))
+      })
+
+      test("#then the omo home, memory and lsp-daemon roots move under ~/.str", () => {
+        const fixture = createFixture()
+        const home = join(fixture.root, "home")
+        const result = run(fixture, ["say", "hi"], {
+          HOME: home,
+          OMO_HOME_DIR: "/x/.omo",
+          OMO_MEMORY_HOME: "/x/.omo/memory",
+          OMO_LSP_DAEMON_DIR: "/x/.omo/lsp-daemon",
+        })
+        expect(result.status).toBe(0)
+        const environment = capture(fixture).env
+        expect(environment.OMO_HOME_DIR).toBe(join(home, ".str"))
+        expect(environment.OMO_MEMORY_HOME).toBe(join(home, ".str", "memory"))
+        expect(environment.OMO_LSP_DAEMON_DIR).toBe(join(home, ".str", "lsp-daemon"))
+      })
+
+      test("#then STR_HOME_DIR replaces ~/.str for the omo home roots", () => {
+        const fixture = createFixture()
+        const strHome = join(fixture.root, "custom-str-home")
+        const result = run(fixture, ["say", "hi"], { HOME: join(fixture.root, "home"), STR_HOME_DIR: strHome })
+        expect(result.status).toBe(0)
+        const environment = capture(fixture).env
+        expect(environment.OMO_HOME_DIR).toBe(strHome)
+        expect(environment.OMO_MEMORY_HOME).toBe(join(strHome, "memory"))
+        expect(environment.OMO_LSP_DAEMON_DIR).toBe(join(strHome, "lsp-daemon"))
+      })
+
+      test("#then inherited RPC endpoints are dropped so str never attaches to omo's daemon", () => {
+        const fixture = createFixture()
+        const result = run(fixture, ["say", "hi"], {
+          OMO_RPC_SOCKET: "/x/.omo/rpc.sock",
+          OMO_RPC_SHARD_ROOT: "/x/.omo/shards",
+          SENPI_RPC_SOCKET: "/x/.senpi/rpc.sock",
+          PI_RPC_SOCKET: "/x/.pi/rpc.sock",
+        })
+        expect(result.status).toBe(0)
+        const environment = capture(fixture).env
+        expect(environment.OMO_RPC_SOCKET).toBeUndefined()
+        expect(environment.OMO_RPC_SHARD_ROOT).toBeUndefined()
+        expect(environment.SENPI_RPC_SOCKET).toBeUndefined()
+        expect(environment.PI_RPC_SOCKET).toBeUndefined()
       })
     })
 
@@ -402,7 +469,7 @@ await runLauncher(["say", "hi"])
         const fixture = createFixture()
         const result = run(fixture, ["--version"])
         expect(result.status).toBe(0)
-        expect(result.stdout.trim()).toBe("omo 1.2.3-test.0 (engine: senpi 2026.8.9)")
+        expect(result.stdout.trim()).toBe("str 1.2.3-test.0 (engine: senpi 2026.8.9)")
         expect(existsSync(fixture.captureFile)).toBe(false)
       })
 
@@ -450,7 +517,7 @@ await runLauncher(["say", "hi"])
           expect(captured.argv).not.toContain("--extension")
           expect(existsSync(captured.env.SENPI_BIN ?? "")).toBe(true)
           expect(captured.env.OMO_AGENT_TOOLKIT_BIN ?? "").not.toContain(fixture.packageRoot)
-          expect((captured.env.OMO_BIN ?? "").replace(/\\/g, "/")).toMatch(/\/bin\/omo\.js$/)
+          expect((captured.env.OMO_BIN ?? "").replace(/\\/g, "/")).toMatch(/\/bin\/str\.js$/)
         })
       }
     })

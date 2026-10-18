@@ -104,7 +104,7 @@ function launcherWithFakeEngine() {
   const captureFile = join(root, "capture.json")
   const launch = (args: string[]) => {
     const env: NodeJS.ProcessEnv = { ...process.env, HOME: root, CAPTURE_FILE: captureFile, OMO_CODING_AGENT_DIR: join(root, "agent") }
-    const result = spawnSync(process.execPath, [join(packageRoot, "bin", "omo.js"), ...args], { cwd: root, encoding: "utf8", env })
+    const result = spawnSync(process.execPath, [join(packageRoot, "bin", "str.js"), ...args], { cwd: root, encoding: "utf8", env })
     return { status: result.status, stderr: result.stderr, argv: JSON.parse(readFileSync(captureFile, "utf8")) as string[] }
   }
   return { packageRoot, launch }

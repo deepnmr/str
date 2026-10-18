@@ -12,7 +12,7 @@ import { NATIVE_AGENT_NAMES } from "../bin/lib/setup-opencode-models.js"
 import { teardownRoots } from "./teardown.test-support"
 
 // The real launcher, not a copy: the stage reads the engine's model catalog through the installed senpi.
-const LAUNCHER = resolve(fileURLToPath(new URL("../bin/omo.js", import.meta.url)))
+const LAUNCHER = resolve(fileURLToPath(new URL("../bin/str.js", import.meta.url)))
 const roots: string[] = []
 
 afterEach(() => teardownRoots(roots))
@@ -27,10 +27,10 @@ function sandbox(): Sandbox {
   return {
     root,
     home,
-    agentDir: join(home, ".omo", "agent"),
+    agentDir: join(home, ".str", "agent"),
     opencodeDir: join(home, ".config", "opencode"),
     omoConfig: join(home, ".omo", "omo.jsonc"),
-    settings: join(home, ".omo", "agent", "settings.json"),
+    settings: join(home, ".str", "agent", "settings.json"),
   }
 }
 

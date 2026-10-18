@@ -62,7 +62,7 @@ describe("omo daemon adopt through the JS launcher", () => {
     delete env.SENPI_CODING_AGENT_DIR
     delete env.PI_CODING_AGENT_DIR
     // when
-    const result = spawnSync(process.execPath, [join(fixture.packageRoot, "bin", "omo.js"), "daemon", "adopt", "dur-host"], { cwd: fixture.root, encoding: "utf8", env })
+    const result = spawnSync(process.execPath, [join(fixture.packageRoot, "bin", "str.js"), "daemon", "adopt", "dur-host"], { cwd: fixture.root, encoding: "utf8", env })
     // then
     if (process.platform === "win32") {
       // win32 has no task host to adopt from: `omo daemon` answers unsupported (exit 4) and the engine never starts

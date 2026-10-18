@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
 import { join, resolve } from "node:path"
+import { ENV_PREFIX, HOME_DIRNAME } from "./brand.js"
 
 /**
  * The one place that answers "where does omo keep engine state".
@@ -11,8 +12,12 @@ import { join, resolve } from "node:path"
  * was started, and an update that changed one of them looked exactly like erased settings.
  */
 
-/** Env names carrying an explicit agent-state directory, most specific first. */
-export const AGENT_DIR_ENV_NAMES = ["OMO_CODING_AGENT_DIR", "SENPI_CODING_AGENT_DIR", "PI_CODING_AGENT_DIR"]
+/**
+ * Env names carrying an explicit agent-state directory. Only the str-prefixed name counts:
+ * inherited OMO_/SENPI_/PI_ values belong to other installs (an omo session exports its own
+ * `~/.omo/agent`), so honoring them would resolve str into another product's state.
+ */
+export const AGENT_DIR_ENV_NAMES = [`${ENV_PREFIX}_CODING_AGENT_DIR`]
 
 /** Marker proving the legacy flat directory was already inspected; written last. */
 export const ADOPTION_MARKER = ".adopted-from-omo-flat"
@@ -39,12 +44,12 @@ export function canonicalAgentDir(env = process.env, home = runtimeHome(env)) {
 }
 
 export function defaultAgentDir(home) {
-  return join(home, ".omo", "agent")
+  return join(home, HOME_DIRNAME, "agent")
 }
 
 /** Pre-unification layout: engine state written directly under the config directory. */
 export function legacyFlatAgentDir(home) {
-  return join(home, ".omo")
+  return join(home, HOME_DIRNAME)
 }
 
 function timestamp() {

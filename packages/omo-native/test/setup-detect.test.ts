@@ -105,7 +105,7 @@ async function populateAll(fixture: Fixture): Promise<void> {
 async function detect(fixture: Fixture, overrides = {}) {
   return detectHarnesses({
     home: fixture.home,
-    env: { SENPI_CODING_AGENT_DIR: fixture.agentDir, XDG_DATA_HOME: fixture.xdg },
+    env: { STR_CODING_AGENT_DIR: fixture.agentDir, XDG_DATA_HOME: fixture.xdg },
     ...overrides,
   })
 }
@@ -147,7 +147,7 @@ function createLauncherFixture(fixture: Fixture): string {
     "plugin/package.json", "plugin/extensions/omo.js", "plugin/runtime/lsp-daemon/dist/cli.js",
 
   ]) write(join(packageRoot, artifact), "fixture\n")
-  return join(packageRoot, "bin", "omo.js")
+  return join(packageRoot, "bin", "str.js")
 }
 
 function runLauncher(launcher: string, fixture: Fixture, args: string[], tty = false) {
@@ -155,10 +155,11 @@ function runLauncher(launcher: string, fixture: Fixture, args: string[], tty = f
   // would outrank the fixture's SENPI_* override and answer with real machine state.
   // launcher.test.ts defends the same way.
   const inherited = { ...process.env }
+  delete inherited.STR_CODING_AGENT_DIR
   delete inherited.OMO_CODING_AGENT_DIR
   delete inherited.PI_CODING_AGENT_DIR
   const env = {
-    ...inherited, HOME: fixture.home, SENPI_CODING_AGENT_DIR: fixture.agentDir,
+    ...inherited, HOME: fixture.home, STR_CODING_AGENT_DIR: fixture.agentDir,
     XDG_DATA_HOME: fixture.xdg,
   }
   // spawnSync only returns after the child has exited and been reaped, so no live child owns the
@@ -341,7 +342,7 @@ describe("setup detection", () => {
       test("#then the canonical directory is the one detected", async () => {
         const fixture = createFixture()
         write(
-          join(fixture.home, ".omo", "agent", "auth.json"),
+          join(fixture.home, ".str", "agent", "auth.json"),
           JSON.stringify({ "canonical-provider": { type: "api_key", key: "SENPI-SECRET" } }),
         )
 

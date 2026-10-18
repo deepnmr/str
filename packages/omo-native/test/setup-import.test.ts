@@ -96,13 +96,13 @@ function fixture(): Fixture {
   mkdirSync(home, { recursive: true })
   cpSync(join(SOURCE_ROOT, "bin"), join(app, "bin"), { recursive: true })
   write(join(app, "package.json"), JSON.stringify({ name: "omo-ai", version: "test", type: "module" }))
-  return { root, home, agentDir, xdg, launcher: join(app, "bin", "omo.js") }
+  return { root, home, agentDir, xdg, launcher: join(app, "bin", "str.js") }
 }
 
 function run(item: Fixture, args: string[], ttyInput?: string) {
   const before = sourceSnapshot(item)
   const env: NodeJS.ProcessEnv = {
-    ...process.env, HOME: item.home, USERPROFILE: item.home, SENPI_CODING_AGENT_DIR: item.agentDir,
+    ...process.env, HOME: item.home, USERPROFILE: item.home, STR_CODING_AGENT_DIR: item.agentDir,
     XDG_DATA_HOME: item.xdg,
   }
   delete env.OMO_CODING_AGENT_DIR
@@ -399,6 +399,7 @@ describe("omo setup import", () => {
           JSON.stringify({ google: { type: "api", key: "IMPORT-SECRET" } }),
         )
         const env: NodeJS.ProcessEnv = { ...process.env, HOME: item.home, USERPROFILE: item.home, XDG_DATA_HOME: item.xdg }
+        delete env.STR_CODING_AGENT_DIR
         delete env.OMO_CODING_AGENT_DIR
         delete env.SENPI_CODING_AGENT_DIR
         delete env.PI_CODING_AGENT_DIR
@@ -406,7 +407,7 @@ describe("omo setup import", () => {
         const result = spawnSync(process.execPath, [item.launcher, "setup", "--yes"], { encoding: "utf8", env })
 
         expect(result.status).toBe(0)
-        expect(existsSync(join(item.home, ".omo", "agent", "auth.json"))).toBe(true)
+        expect(existsSync(join(item.home, ".str", "agent", "auth.json"))).toBe(true)
       })
     })
   })

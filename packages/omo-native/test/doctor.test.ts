@@ -45,7 +45,7 @@ function createFixture(): Fixture {
   for (const [, artifact] of artifacts) writeFile(join(packageRoot, artifact))
   const agentDir = join(root, "agent")
   mkdirSync(agentDir, { recursive: true })
-  return { root, packageRoot, launcher: join(packageRoot, "bin", "omo.js"), agentDir }
+  return { root, packageRoot, launcher: join(packageRoot, "bin", "str.js"), agentDir }
 }
 
 function writeFakePs(dir: string, output: string): string {
@@ -63,7 +63,7 @@ function withoutHostProcesses(fixture: Fixture, env: NodeJS.ProcessEnv): NodeJS.
 function run(fixture: Fixture, env: NodeJS.ProcessEnv = {}) {
   return spawnSync(process.execPath, [fixture.launcher, "doctor"], {
     encoding: "utf8",
-    env: withoutHostProcesses(fixture, { ...process.env, SENPI_CODING_AGENT_DIR: fixture.agentDir, ...env }),
+    env: withoutHostProcesses(fixture, { ...process.env, STR_CODING_AGENT_DIR: fixture.agentDir, ...env }),
   })
 }
 
@@ -148,12 +148,12 @@ describe("omo doctor", () => {
     })
   })
 
-  describe("#given SENPI_CODING_AGENT_DIR points to an alternate agent directory", () => {
+  describe("#given STR_CODING_AGENT_DIR points to an alternate agent directory", () => {
     test("#then doctor reads settings from that directory first", () => {
       const fixture = createFixture()
       const alternate = join(fixture.root, "alternate-agent")
       writeFile(join(alternate, "settings.json"), JSON.stringify({ packages: ["@code-yeongyu/omo-senpi"] }))
-      const result = run(fixture, { SENPI_CODING_AGENT_DIR: alternate })
+      const result = run(fixture, { STR_CODING_AGENT_DIR: alternate })
       expect(result.status).toBe(0)
       expect(result.stdout).toContain("WARN duplicate @code-yeongyu/omo-senpi")
     })
@@ -162,6 +162,7 @@ describe("omo doctor", () => {
 
 function envWithoutAgentDir(home: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env, HOME: home, USERPROFILE: home }
+  delete env.STR_CODING_AGENT_DIR
   delete env.OMO_CODING_AGENT_DIR
   delete env.SENPI_CODING_AGENT_DIR
   delete env.PI_CODING_AGENT_DIR
@@ -192,7 +193,7 @@ describe("omo doctor", () => {
         const fixture = createFixture()
         const home = join(fixture.root, "home")
         writeFile(
-          join(home, ".omo", "agent", "settings.json"),
+          join(home, ".str", "agent", "settings.json"),
           JSON.stringify({ packages: ["@code-yeongyu/omo-senpi"] }),
         )
 

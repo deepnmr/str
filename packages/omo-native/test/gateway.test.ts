@@ -64,7 +64,7 @@ describe("omo gateway resolves a separately installed package", () => {
     expect(result.stderr).toBe("")
     expect(JSON.parse(result.stdout)).toEqual({
       args: ["connect", "--scope", "qa"],
-      agentDir: join(env.HOME, ".omo", "agent"),
+      agentDir: join(env.HOME, ".str", "agent"),
       home: env.HOME,
       pluginRoot: join(app, "plugin"),
       threadSdkUrl: pathToFileURL(join(app, "plugin", THREAD_SDK)).href,
@@ -206,7 +206,7 @@ describe("omo doctor gateway rows", () => {
       'import { gatewayDoctorLines } from "./bin/lib/gateway.js"',
       "runDoctor({ harnesses: [] }, [], { gateway: process.argv[2] ? JSON.parse(process.argv[2]) : await gatewayDoctorLines(), fetchDistTags: () => ({}), list: () => [], listDirs: () => [], hasRepo: () => false })",
     ].join("\n"))
-    const env = { ...home('{"gateway":{}}'), PATH: process.env.PATH ?? "", OMO_CODING_AGENT_DIR: join(app, "agent") }
+    const env = { ...home('{"gateway":{}}'), PATH: process.env.PATH ?? "", STR_CODING_AGENT_DIR: join(app, "agent") }
     const doctor = (gateway?: string[]) => spawnSync(process.execPath, [join(app, "doctor.mjs"), ...(gateway ? [JSON.stringify(gateway)] : [])], {
       cwd: app,
       encoding: "utf8",
@@ -221,7 +221,7 @@ describe("omo doctor gateway rows", () => {
       name: "@oh-my-opencode/omo-gateway", type: "module", exports: { "./host": "./absent.js" }, omoGateway: { hostContract: 1 },
     }))
     const broken = doctor()
-    const cli = spawnSync(process.execPath, [join(app, "bin/omo.js"), "gateway", "status"], {
+    const cli = spawnSync(process.execPath, [join(app, "bin/str.js"), "gateway", "status"], {
       cwd: app, encoding: "utf8", env,
     })
 

@@ -50,7 +50,7 @@ describe("anthropic tool-search compatibility", () => {
       test("#then the scan reads the real launcher sources", () => {
         const files = shippedSourceFiles()
         expect(files).toContain(join(PACKAGE_ROOT, "bin", "senpi-patch.mjs"))
-        expect(files).toContain(join(PACKAGE_ROOT, "bin", "omo.js"))
+        expect(files).toContain(join(PACKAGE_ROOT, "bin", "str.js"))
       })
 
       test("#then no shipped file re-declares the Anthropic native tool-search contract", () => {

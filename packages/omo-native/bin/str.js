@@ -27,6 +27,6 @@ try {
     else await runLauncher()
   }
 } catch (error) {
-  console.error(`omo: ${error.message}`)
+  console.error(`str: ${error.message}`)
   process.exitCode = 1
 }

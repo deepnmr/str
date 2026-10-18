@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url"
 import { teardownRoots } from "./teardown.test-support"
 
 // The real launcher: the model-choice stage reads the engine's model catalog through the installed senpi.
-const LAUNCHER = resolve(fileURLToPath(new URL("../bin/omo.js", import.meta.url)))
+const LAUNCHER = resolve(fileURLToPath(new URL("../bin/str.js", import.meta.url)))
 const TTY_DRIVER = resolve(fileURLToPath(new URL("tty-driver.py", import.meta.url)))
 const TELEMETRY_ENV = "OMO_SEND_ANONYMOUS_TELEMETRY=0"
 const PLAN_PROMPT = "[Y/n]"
@@ -46,7 +46,7 @@ function opencodeUser(): Sandbox {
   })
   write(join(opencodeDir, "skills", "release-notes", "SKILL.md"), "---\nname: release-notes\ndescription: notes\n---\nbody\n")
   write(join(opencodeDir, "skills", "broken", "README.md"), "not a skill\n")
-  return { home, agentDir: join(home, ".omo", "agent"), omoConfig: join(home, ".omo", "omo.jsonc") }
+  return { home, agentDir: join(home, ".str", "agent"), omoConfig: join(home, ".omo", "omo.jsonc") }
 }
 
 function env(item: Sandbox): NodeJS.ProcessEnv {

@@ -88,7 +88,7 @@ describe("omo doctor transient memory identities", () => {
     writeFile(join(memoryHome, "agents", "transient-2", "runtime", "locks", ".keep"))
     writeFile(join(memoryHome, "transient-runs", "aaa-1-zz", "agents", "x", "runtime", "locks", ".keep"))
 
-    const result = spawnSync(process.execPath, [join(packageRoot, "bin", "omo.js"), "doctor"], {
+    const result = spawnSync(process.execPath, [join(packageRoot, "bin", "str.js"), "doctor"], {
       encoding: "utf8",
       env: {
         ...process.env,

@@ -12,6 +12,8 @@ const manifestPath = resolve(import.meta.dir, "..", "package.json")
 const sourceExtensionBundlePath = resolve(import.meta.dir, "..", "..", "omo-senpi", "plugin", "extensions", "omo.js")
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
   name: string
+  version?: string
+  description?: string
   bin?: Record<string, string>
   files?: string[]
   engines?: { node?: string }
@@ -23,9 +25,17 @@ const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
 
 describe("omo-ai published package shape", () => {
   describe("#given the omo-native package manifest", () => {
+    describe("#when the package identity is audited", () => {
+      test("#then it is published as @deepnmr/str at the pinned version", () => {
+        expect(manifest.name).toBe("@deepnmr/str")
+        expect(manifest.version).toBe("5.1.35")
+        expect(manifest.description).toContain("str")
+      })
+    })
+
     describe("#when the bin map is audited", () => {
-      test("#then it exposes exactly the omo command pointing at bin/omo.js", () => {
-        expect(manifest.bin).toEqual({ omo: "bin/omo.js" })
+      test("#then it exposes exactly the str command pointing at bin/str.js", () => {
+        expect(manifest.bin).toEqual({ str: "bin/str.js" })
       })
     })
 
@@ -61,7 +71,7 @@ describe("omo-ai published package shape", () => {
     describe("#when the repository field is audited", () => {
       test("#then it points at the canonical github url", () => {
         expect(manifest.repository?.url).toBe(
-          "git+https://github.com/code-yeongyu/oh-my-openagent.git",
+          "git+https://github.com/deepnmr/str.git",
         )
       })
     })
