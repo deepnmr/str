@@ -93,6 +93,11 @@ export function daemonBaseDir(
 		if (!platform.path.isAbsolute(override)) throw new InvalidDaemonDirectoryError(override);
 		return platform.path.resolve(override);
 	}
+	const omoHome = env["OMO_HOME_DIR"];
+	if (omoHome !== undefined && omoHome.trim() !== "") {
+		if (!platform.path.isAbsolute(omoHome)) throw new InvalidDaemonDirectoryError(omoHome);
+		return platform.path.resolve(platform.path.join(omoHome, "lsp-daemon"));
+	}
 	return platform.path.resolve(platform.path.join(platform.homedir(), ".omo", "lsp-daemon"));
 }
 

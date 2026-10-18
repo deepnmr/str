@@ -73,6 +73,28 @@ describe("OMO daemon environment contract", () => {
 			InvalidDaemonDirectoryError,
 		);
 	});
+
+	it("#given an absolute OMO_HOME_DIR #when resolving the base #then it is used under lsp-daemon", () => {
+		expect(daemonBaseDir({ OMO_HOME_DIR: "/custom/omo-home" }, unixPlatform("/Users/qa"))).toBe(
+			"/custom/omo-home/lsp-daemon",
+		);
+	});
+
+	it("#given a blank OMO_HOME_DIR #when resolving the base #then the default home is used", () => {
+		expect(daemonBaseDir({ OMO_HOME_DIR: "   " }, unixPlatform("/Users/qa"))).toBe("/Users/qa/.omo/lsp-daemon");
+	});
+
+	it("#given a relative OMO_HOME_DIR #when resolving the base #then it is rejected", () => {
+		expect(() => daemonBaseDir({ OMO_HOME_DIR: "relative/home" }, unixPlatform())).toThrow(
+			InvalidDaemonDirectoryError,
+		);
+	});
+
+	it("#given both OMO_LSP_DAEMON_DIR and OMO_HOME_DIR #when resolving the base #then the more specific daemon override wins", () => {
+		expect(
+			daemonBaseDir({ [OMO_LSP_DAEMON_DIR]: "/specific/daemon", OMO_HOME_DIR: "/custom/omo-home" }, unixPlatform()),
+		).toBe("/specific/daemon");
+	});
 });
 
 describe("daemon version grammar", () => {
