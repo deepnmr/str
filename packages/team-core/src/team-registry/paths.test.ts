@@ -32,12 +32,33 @@ describe("paths", () => {
   test("resolveBaseDir defaults to ~/.omo", () => {
     // given
     const config = TeamModeConfigSchema.parse({ base_dir: undefined })
+    const previous = process.env.OMO_HOME_DIR
+    delete process.env.OMO_HOME_DIR
 
     // when
     const resolvedBaseDir = resolveBaseDir(config)
+    if (previous !== undefined) process.env.OMO_HOME_DIR = previous
 
     // then
     expect(resolvedBaseDir).toBe(path.join(homedir(), ".omo"))
+  })
+
+  test("#given a distribution pins OMO_HOME_DIR #when no base_dir is configured #then teams live under that home", () => {
+    // given
+    const config = TeamModeConfigSchema.parse({ base_dir: undefined })
+    const previous = process.env.OMO_HOME_DIR
+    process.env.OMO_HOME_DIR = path.join(tmpdir(), "pinned-brand-home")
+
+    try {
+      // when
+      const resolvedBaseDir = resolveBaseDir(config)
+
+      // then
+      expect(resolvedBaseDir).toBe(path.join(tmpdir(), "pinned-brand-home"))
+    } finally {
+      if (previous === undefined) delete process.env.OMO_HOME_DIR
+      else process.env.OMO_HOME_DIR = previous
+    }
   })
 
   test("resolveBaseDir honors override", () => {

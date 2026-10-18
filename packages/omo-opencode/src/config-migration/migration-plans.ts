@@ -1,7 +1,7 @@
 import type { MigrationSourceDescriptor, MigrationTransform } from "@oh-my-opencode/omo-config-core"
 
 import { discoverLegacyConfigGroups, CONFIG_JSONC_MIGRATION_ID, OPENCODE_CONFIG_MIGRATION_ID } from "./discovery"
-import { canonicalPath, discoveryFileSystem, hostPathOperations, pathKey, projectDirectories } from "./discovery-paths"
+import { canonicalPath, discoveryFileSystem, hostPathOperations, pathKey, projectDirectories, userBrandDir } from "./discovery-paths"
 import { mergeRecords } from "./record-values"
 import { transformConfigJsoncSources } from "./transform-config-jsonc"
 import { transformOpenCodeSources } from "./transform-opencode"
@@ -56,8 +56,7 @@ function descriptors(
   const homeDir = canonicalPath(options.homeDir, options)
   const pathOperations = hostPathOperations(options)
   const userBackupRoot = pathOperations.join(
-    homeDir,
-    ".omo",
+    canonicalPath(userBrandDir(options), options),
     `migration-backup-${timestamp}-opencode-config`,
   )
   return sources.map((source) => ({
@@ -190,7 +189,7 @@ export function createLegacyConfigMigrationPlans(
   const timestamp = backupTimestamp(options.backupTimestamp)
   const [openCodeGroup, configJsoncGroup] = discoverLegacyConfigGroups(options)
   const pathOperations = hostPathOperations(options)
-  const userTargetPath = pathOperations.join(options.homeDir, ".omo", "omo.jsonc")
+  const userTargetPath = pathOperations.join(userBrandDir(options), "omo.jsonc")
   const userSources = openCodeGroup.sources.filter((source) => source.projectRoot === undefined)
   const projectSources = new Map<string, DiscoveredLegacyConfigSource[]>()
   for (const source of openCodeGroup.sources) {
@@ -233,7 +232,7 @@ export function createLegacyConfigMigrationPlans(
     if (targetPath === undefined) return
     reasoningTargets.set(pathKey(targetPath, options), targetPath)
   }
-  addReasoningTarget(existingOmoConfigPath(options.pathOperations.join(options.homeDir, ".omo"), options))
+  addReasoningTarget(existingOmoConfigPath(userBrandDir(options), options))
   for (const projectRoot of projectDirectories(options)) {
     addReasoningTarget(existingOmoConfigPath(options.pathOperations.join(projectRoot, ".omo"), options))
   }

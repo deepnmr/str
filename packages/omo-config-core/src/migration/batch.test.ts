@@ -4,6 +4,28 @@ import { migrationJournalPath, runMigrations } from "../index"
 import { MemoryMigrationFileSystem, migrationFixture, parseFile } from "./migration-test-support"
 
 describe("runMigrations", () => {
+  test("#given the process pins OMO_HOME_DIR and no env is passed #when a batch runs #then its lock lives under that home, not ~/.omo", () => {
+    // given
+    const fileSystem = new MemoryMigrationFileSystem()
+    const previous = { HOME: process.env.HOME, OMO_HOME_DIR: process.env.OMO_HOME_DIR }
+    process.env.HOME = "/home/alice"
+    process.env.OMO_HOME_DIR = "/home/alice/.str"
+
+    try {
+      // when
+      const result = runMigrations({ discover: () => [], fileSystem, pid: 100 })
+
+      // then
+      expect(result.status).toBe("completed")
+      expect([...fileSystem.directories]).toEqual(["/home/alice/.str"])
+    } finally {
+      for (const [name, value] of Object.entries(previous)) {
+        if (value === undefined) delete process.env[name]
+        else process.env[name] = value
+      }
+    }
+  })
+
   test("#given a long-expired lock owned by a live process #when the next batch starts #then it reclaims the stale lease and completes", () => {
     // given
     const fileSystem = new MemoryMigrationFileSystem()

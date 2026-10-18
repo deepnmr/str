@@ -189,7 +189,12 @@ export function runMigrations(options: RunMigrationsOptions): MigrationBatchRunR
   const clock = options.clock ?? DEFAULT_MIGRATION_CLOCK
   const home = globalThis.process.env["HOME"]
   const userProfile = globalThis.process.env["USERPROFILE"]
-  const env = options.env ?? { ...(home === undefined ? {} : { HOME: home }), ...(userProfile === undefined ? {} : { USERPROFILE: userProfile }) }
+  const omoHomeDir = globalThis.process.env["OMO_HOME_DIR"]
+  const env = options.env ?? {
+    ...(home === undefined ? {} : { HOME: home }),
+    ...(userProfile === undefined ? {} : { USERPROFILE: userProfile }),
+    ...(omoHomeDir === undefined ? {} : { OMO_HOME_DIR: omoHomeDir }),
+  }
   const fileSystem = options.fileSystem ?? DEFAULT_MIGRATION_FILE_SYSTEM
   const process: MigrationProcess = { isAlive: options.isProcessAlive ?? DEFAULT_MIGRATION_PROCESS.isAlive, pid: options.pid ?? DEFAULT_MIGRATION_PROCESS.pid }
   const writeTarget = options.writeTarget ?? writeOmoMigrationTarget

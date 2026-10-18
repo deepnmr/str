@@ -13,6 +13,12 @@ export const CONFIG_FILE_NAMES = [
   "oh-my-opencode.json",
 ] as const
 
+/** The per-user brand home the migrations write into: OMO_HOME_DIR when a distribution pins one, else <home>/.omo. */
+export function userBrandDir(options: ConfigMigrationDiscoveryOptions): string {
+  const pinned = options.environment?.["OMO_HOME_DIR"]?.trim()
+  return pinned ? pinned : options.pathOperations.join(options.homeDir, ".omo")
+}
+
 export function isWindowsPathOperations(options: ConfigMigrationDiscoveryOptions): boolean {
   return options.pathOperations === win32
 }

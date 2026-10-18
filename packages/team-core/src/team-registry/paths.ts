@@ -66,7 +66,8 @@ function resolveContainedPath(baseDir: string, pathSegments: readonly string[]):
 }
 
 export function resolveBaseDir(config: TeamModeConfig): string {
-  return expandHomeDirectory(config.base_dir ?? path.join(homedir(), ".omo"))
+  const pinnedHome = process.env.OMO_HOME_DIR?.trim()
+  return expandHomeDirectory(config.base_dir ?? (pinnedHome ? path.resolve(pinnedHome) : path.join(homedir(), ".omo")))
 }
 
 function expandHomeDirectory(directoryPath: string): string {

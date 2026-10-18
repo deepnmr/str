@@ -101,7 +101,7 @@ export function runSenpiStartupMigration(options: SenpiStartupMigrationOptions):
         createOpenCodeRoutingNoticePlan({
           environment,
           homeDir,
-          targetPath: userConfigPath(homeDir, pathOperations, options.fileSystem),
+          targetPath: userConfigPath(homeDir, environment, pathOperations, options.fileSystem),
         }),
       ],
     })
@@ -125,12 +125,14 @@ export function runSenpiStartupMigration(options: SenpiStartupMigrationOptions):
 // unification plan creates omo.jsonc.
 function userConfigPath(
   homeDir: string,
+  environment: Readonly<Record<string, string | undefined>>,
   pathOperations: ConfigMigrationPathOperations,
   fileSystem: MigrationFileSystem | undefined,
 ): string {
   const exists = fileSystem?.existsSync ?? existsSync
-  const jsonc = pathOperations.join(homeDir, ".omo", "omo.jsonc")
-  const json = pathOperations.join(homeDir, ".omo", "omo.json")
+  const brandDir = environment["OMO_HOME_DIR"]?.trim() || pathOperations.join(homeDir, ".omo")
+  const jsonc = pathOperations.join(brandDir, "omo.jsonc")
+  const json = pathOperations.join(brandDir, "omo.json")
   return exists(jsonc) || !exists(json) ? jsonc : json
 }
 

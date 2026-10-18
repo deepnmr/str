@@ -25,7 +25,8 @@ function agentDirectory(env: AgentDirEnv): string {
     const configured = env[name]?.trim()
     if (configured) return resolve(configured)
   }
-  return join(env.HOME ?? env.USERPROFILE ?? homedir(), ".omo", "agent")
+  const pinnedHome = env.OMO_HOME_DIR?.trim()
+  return join(pinnedHome ? resolve(pinnedHome) : join(env.HOME ?? env.USERPROFILE ?? homedir(), ".omo"), "agent")
 }
 
 // Keyed by the real path: a project reached through a symlink (or macOS /var vs /private/var) must

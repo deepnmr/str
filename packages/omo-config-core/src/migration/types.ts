@@ -3,6 +3,7 @@ import { DEFAULT_WRITE_FILE_SYSTEM, type OmoConfigEdit, type OmoConfigWriteFileS
 export type MigrationEnvironment = {
   readonly HOME?: string
   readonly USERPROFILE?: string
+  readonly OMO_HOME_DIR?: string
 }
 
 export type MigrationClock = {

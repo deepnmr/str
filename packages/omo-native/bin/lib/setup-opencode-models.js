@@ -11,7 +11,6 @@
 
 import { existsSync, readdirSync } from "node:fs"
 import { isAbsolute, join, relative, resolve } from "node:path"
-import { brandHome } from "./agent-dir.js"
 import providerMap from "./provider-map.json" with { type: "json" }
 import { opencodeConfigSources, readOpencodeConfig } from "./setup-opencode-assets.js"
 
@@ -54,12 +53,13 @@ function record(value) {
 
 // The first start of any current harness runs the config unification migration, which keeps none
 // of a legacy file's categories or agents and moves the file to
-// `~/.omo/migration-backup-<timestamp>-opencode-config/<path relative to home>`
-// (omo-opencode config-migration/migration-plans.ts). The newest moved copy stands in for it.
-function editionFile(path, home, notices) {
+// `<brand home>/migration-backup-<timestamp>-opencode-config/<path relative to home>`, the brand home
+// being OMO_HOME_DIR (str pins ~/.str) or ~/.omo (omo-opencode config-migration/discovery-paths.ts
+// userBrandDir). The newest moved copy stands in for it.
+function editionFile(path, home, env, notices) {
   if (existsSync(path)) return path
   const inHome = relative(home, path)
-  const root = brandHome({}, home)
+  const root = env.OMO_HOME_DIR?.trim() ? resolve(env.OMO_HOME_DIR) : join(home, ".omo")
   if (inHome.startsWith("..") || isAbsolute(inHome) || !existsSync(root)) return path
   const moved = readdirSync(root)
     .filter((name) => /^migration-backup-.+-opencode-config$/.test(name))
@@ -83,7 +83,7 @@ export function readEditionRouting({ home, env }) {
   const directories = explicitDir ? [resolve(explicitDir), globalDir] : [globalDir]
   // readOpencodeConfig lets later files win, so the highest-precedence file is read last.
   const legacyFiles = directories
-    .flatMap((directory) => EDITION_FILES.map((name) => editionFile(join(directory, name), home, notices)))
+    .flatMap((directory) => EDITION_FILES.map((name) => editionFile(join(directory, name), home, env, notices)))
     .reverse()
   const edition = readOpencodeConfig(legacyFiles, "model choices", notices)
   return { agents: record(edition.agents), categories: record(edition.categories), notices }
